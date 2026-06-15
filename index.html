@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>البحث عن اللجان الامتحانية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-base:        #F2EEE9;
+    --glass-bg:       rgba(255, 255, 255, 0.62);
+    --glass-border:   rgba(255, 255, 255, 0.85);
+    --glass-shadow:   0 8px 40px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.06);
+    --card-shadow:    0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.07);
+    --text-primary:   #1A1612;
+    --text-secondary: #6E6560;
+    --text-tertiary:  #A09890;
+    --accent:         #C06B3A;
+    --accent-light:   rgba(192,107,58,0.10);
+    --accent-glow:    rgba(192,107,58,0.25);
+    --success:        #2D8A5E;
+    --success-light:  rgba(45,138,94,0.10);
+    --border-subtle:  rgba(0,0,0,0.07);
+    --divider:        rgba(0,0,0,0.06);
+    --input-bg:       rgba(255,255,255,0.75);
+    --input-shadow:   0 2px 20px rgba(0,0,0,0.08);
+    --radius-xl:      24px;
+    --radius-lg:      18px;
+    --radius-md:      12px;
+    --radius-sm:      8px;
+    --font-primary:   'IBM Plex Sans Arabic', 'Segoe UI', system-ui, sans-serif;
+    --font-display:   'Amiri', 'IBM Plex Sans Arabic', serif;
+    --transition:     cubic-bezier(0.34, 1.2, 0.64, 1);
+    --ease:           cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-primary);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(192,107,58,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 70% at 80% 80%, rgba(45,100,180,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(255,245,235,0.6) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 100px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 52px;
+    animation: fadeSlideDown 0.8s var(--ease) both;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-glow);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 22px;
+  }
+
+  .header-badge svg { width: 14px; height: 14px; }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 5vw, 50px);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+  }
+
+  .header-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.75;
+  }
+
+  /* ── Search ── */
+  .search-section {
+    width: 100%;
+    max-width: 680px;
+    margin-bottom: 44px;
+    animation: fadeSlideUp 0.8s var(--ease) 0.15s both;
+  }
+
+  .search-wrapper { position: relative; }
+
+  .search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    width: 22px; height: 22px;
+    pointer-events: none;
+    transition: color 0.25s var(--ease);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 20px 56px 20px 56px;
+    font-family: var(--font-primary);
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-primary);
+    background: var(--input-bg);
+    border: 1.5px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--input-shadow), inset 0 1px 0 rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    outline: none;
+    transition: all 0.3s var(--ease);
+    text-align: right;
+    direction: rtl;
+  }
+
+  .search-input::placeholder { color: var(--text-tertiary); }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--input-shadow), 0 0 0 3.5px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.92);
+  }
+
+  .search-input:focus ~ .search-icon { color: var(--accent); }
+
+  .search-clear {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--text-tertiary);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.2s var(--ease);
+  }
+
+  .search-clear.visible { opacity: 1; pointer-events: all; }
+  .search-clear:hover { background: var(--text-secondary); transform: translateY(-50%) scale(1.1); }
+  .search-clear svg { width: 14px; height: 14px; }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--text-tertiary);
+    flex-wrap: wrap;
+  }
+  .stats-bar span { display: flex; align-items: center; gap: 5px; }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+
+  /* ── Results ── */
+  .results-section { width: 100%; max-width: 680px; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.5s var(--ease) 0.3s both;
+  }
+
+  .empty-state-icon {
+    width: 80px; height: 80px;
+    margin: 0 auto 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(12px);
+  }
+
+  .empty-state-icon svg { width: 36px; height: 36px; color: var(--text-tertiary); }
+  .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; color: var(--text-tertiary); line-height: 1.7; }
+
+  .no-results { text-align: center; padding: 50px 20px; display: none; }
+  .no-results-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 20px;
+    background: rgba(220,50,50,0.08);
+    border: 1px solid rgba(220,50,50,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .no-results-icon svg { width: 28px; height: 28px; color: #C0392B; }
+  .no-results h3 { font-size: 17px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .no-results p { font-size: 14px; color: var(--text-tertiary); }
+
+  /* ══════════════════════════════════════
+     Student Card — Clean Data Dashboard
+     ══════════════════════════════════════ */
+  .student-card {
+    background: linear-gradient(170deg, #0D1B2A 0%, #0A1520 60%, #0C1C30 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 26px;
+    box-shadow:
+      0 28px 70px rgba(0,0,0,0.45),
+      0 6px 20px rgba(0,0,0,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    display: none;
+    animation: cardEntrance 0.5s var(--transition) both;
+    overflow: hidden;
+  }
+
+  /* ── Card Top Bar ── */
+  .card-topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 26px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .dark-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(240,176,56,0.28), rgba(240,176,56,0.10));
+    border: 1.5px solid rgba(240,176,56,0.45);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700;
+    color: #F0B038;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .topbar-title {
+    font-size: 11px; font-weight: 700;
+    color: rgba(255,255,255,0.30);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .topbar-school {
+    font-size: 13px; font-weight: 600;
+    color: rgba(240,176,56,0.70);
+  }
+
+  /* ── Fields Container ── */
+  .card-fields {
+    padding: 6px 0;
+  }
+
+  /* Single full-width field */
+  .field-row {
+    padding: 18px 26px;
+    border-bottom: 1px solid rgba(255,255,255,0.055);
+    transition: background 0.18s ease;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-row:hover { background: rgba(255,255,255,0.03); }
+
+  /* Two-column field row */
+  .field-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid rgba(255,255,255,0.055);
+  }
+  .field-row-2col:last-child { border-bottom: none; }
+
+  .field-cell {
+    padding: 18px 26px;
+    position: relative;
+    transition: background 0.18s ease;
+  }
+  .field-cell:hover { background: rgba(255,255,255,0.03); }
+  .field-cell + .field-cell::before {
+    content: '';
+    position: absolute;
+    right: 0; top: 18%; bottom: 18%;
+    width: 1px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* Label & Value shared styles */
+  .field-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    color: rgba(255,255,255,0.32);
+    letter-spacing: 0.07em;
+    margin-bottom: 7px;
+  }
+
+  .field-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 17px; font-weight: 700;
+    color: #EDE8DC;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  /* Name gets slightly larger */
+  .field-value.value-name {
+    font-size: 19px;
+    color: #F5F0E6;
+  }
+
+  /* Committee number — accent gold */
+  .field-value.value-committee {
+    font-size: 28px;
+    color: #F0B038;
+    text-shadow: 0 0 18px rgba(240,176,56,0.40);
+    line-height: 1.1;
+  }
+
+  /* Classroom — green tint */
+  .field-value.value-classroom {
+    color: #68D9A4;
+  }
+
+  /* ── Multiple results list ── */
+  .results-header {
+    display: none;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .results-count { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .results-count strong { color: var(--accent); }
+
+  .results-list { display: none; flex-direction: column; gap: 12px; }
+
+  .result-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 18px 22px;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px) saturate(1.4);
+    cursor: pointer;
+    transition: all 0.22s var(--ease);
+    animation: cardEntrance 0.4s var(--transition) both;
+  }
+
+  .result-item:hover {
+    transform: translateY(-3px) scale(1.005);
+    box-shadow: var(--card-shadow);
+    border-color: var(--accent-glow);
+  }
+
+  .result-item-header { display: flex; align-items: center; gap: 14px; }
+
+  .result-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C06B3A 0%, #E8935A 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 3px 12px var(--accent-glow);
+    user-select: none;
+  }
+
+  .result-info { flex: 1; min-width: 0; }
+  .result-name { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+  .result-meta { font-size: 13px; color: var(--text-secondary); display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .result-arrow { color: var(--text-tertiary); flex-shrink: 0; }
+
+  /* Back button */
+  .back-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 0;
+    margin-bottom: 18px;
+    transition: gap 0.2s var(--ease);
+  }
+  .back-btn:hover { gap: 14px; }
+  .back-btn svg { width: 18px; height: 18px; }
+
+  /* ── Animations ── */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: scale(0.96) translateY(16px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    text-align: center;
+    padding: 14px 20px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    background: linear-gradient(to top, var(--bg-base) 55%, transparent);
+    pointer-events: none;
+  }
+
+  @media (max-width: 520px) {
+    .page-wrapper { padding: 36px 14px 80px; }
+    .header-title { font-size: 26px; }
+    .stats-bar { gap: 14px; }
+    .field-row { padding: 15px 18px; }
+    .field-cell { padding: 15px 16px; }
+    .field-value { font-size: 15px; }
+    .field-value.value-name { font-size: 16px; }
+    .field-value.value-committee { font-size: 24px; }
+    .card-topbar { padding: 18px 18px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <header class="header">
+    <div class="header-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      متوسطة مكة المكرمة بجدة
+    </div>
+    <h1 class="header-title">الباحث عن لجان الاختبار</h1>
+    <p class="header-subtitle">ابحث باسم الطالب أو رقم الهوية الوطنية للاطلاع على تفاصيل لجنته الامتحانية</p>
+  </header>
+
+  <section class="search-section">
+    <div class="search-wrapper">
+      <input
+        type="text"
+        class="search-input"
+        id="searchInput"
+        placeholder="ابحث باسم الطالب أو رقم الهوية…"
+        autocomplete="off"
+        spellcheck="false"
+        dir="rtl"
+      />
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <button class="search-clear" id="clearBtn" aria-label="مسح">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="stats-bar">
+      <span><span class="dot"></span>&nbsp;النظام متاح</span>
+      <span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        798 طالب مسجّل
+      </span>
+      <span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        24 لجنة امتحانية
+      </span>
+    </div>
+  </section>
+
+  <section class="results-section">
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3l2 2"/>
+        </svg>
+      </div>
+      <h3>ابدأ بكتابة اسم الطالب</h3>
+      <p>أدخل الاسم أو رقم الهوية الوطنية<br/>وستظهر نتائج البحث فوراً</p>
+    </div>
+
+    <div class="no-results" id="noResults">
+      <div class="no-results-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M8 8l6 6M14 8l-6 6"/>
+        </svg>
+      </div>
+      <h3>لا توجد نتائج</h3>
+      <p>لم يتم العثور على طالب بهذا الاسم أو رقم الهوية</p>
+    </div>
+
+    <div class="results-header" id="resultsHeader">
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+    <div class="results-list" id="resultsList"></div>
+
+    <button class="back-btn" id="backBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5m7-7 7 7-7 7"/>
+      </svg>
+      العودة للنتائج
+    </button>
+
+    <div class="student-card" id="studentCard">
+
+      <!-- Top Bar -->
+      <div class="card-topbar">
+        <div class="dark-avatar" id="cardAvatar"></div>
+        <div>
+          <div class="topbar-title">بيانات الطالب</div>
+          <div class="topbar-school">متوسطة مكة المكرمة بجدة</div>
+        </div>
+      </div>
+
+      <!-- Fields -->
+      <div class="card-fields">
+
+        <!-- Name — full width -->
+        <div class="field-row">
+          <span class="field-label">الاسم</span>
+          <span class="field-value value-name" id="cardName"></span>
+        </div>
+
+        <!-- Committee + Classroom — 2 cols -->
+        <div class="field-row-2col">
+          <div class="field-cell">
+            <span class="field-label">اللجنة</span>
+            <span class="field-value value-committee" id="cardCommittee"></span>
+          </div>
+          <div class="field-cell">
+            <span class="field-label">مقر اللجنة</span>
+            <span class="field-value value-classroom" id="cardClassroom"></span>
+          </div>
+        </div>
+
+        <!-- Building + Class — 2 cols -->
+        <div class="field-row-2col">
+          <div class="field-cell">
+            <span class="field-label">مبنى اللجنة</span>
+            <span class="field-value" id="cardBuilding"></span>
+          </div>
+          <div class="field-cell">
+            <span class="field-label">اسم الصف</span>
+            <span class="field-value" id="cardClass"></span>
+          </div>
+        </div>
+
+        <!-- Seat — full width -->
+        <div class="field-row">
+          <span class="field-label">رقم الجلوس</span>
+          <span class="field-value" id="cardSeat"></span>
+        </div>
+        <!-- hidden: cardId kept in DOM for search logic only -->
+        <span id="cardId" style="display:none;"></span>
+
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<div class="footer">جميع البيانات محمية ومخصصة للاستخدام الرسمي فقط</div>
+
+<script>
+const STUDENTS = [{"name":"أحمد الحسن عطيه الشمراني","id":"1165752625","class":"الأول المتوسط","committee":"1","seat":"3245507001","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد خالد بن احمد اليامي","id":"1164029777","class":"الأول المتوسط","committee":"1","seat":"3245507002","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد ضيف الله احمد الغامدي","id":"1163724162","class":"الأول المتوسط","committee":"1","seat":"3245507003","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد علي بلغيث حكمي","id":"1165011717","class":"الأول المتوسط","committee":"1","seat":"3245507004","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد علي بن أحمد العيسي","id":"1159423985","class":"الأول المتوسط","committee":"1","seat":"3245507005","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أسامه سالم يوسف الحربى","id":"1165475060","class":"الأول المتوسط","committee":"1","seat":"3245507006","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أسامه فهد دخيل الله السفياني","id":"1167367695","class":"الأول المتوسط","committee":"1","seat":"3245507007","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أصيل محسن مكمي الحسناني","id":"1162872897","class":"الأول المتوسط","committee":"1","seat":"3245507008","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أنس مصطفى محمد الشريف","id":"1164128249","class":"الأول المتوسط","committee":"1","seat":"3245507009","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أنس وليد فهد الحربي","id":"1166861441","class":"الأول المتوسط","committee":"1","seat":"3245507010","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم ادريس علي الحمضي","id":"1165730019","class":"الأول المتوسط","committee":"1","seat":"3245507011","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم سامي بن محمد المغربي","id":"1167078490","class":"الأول المتوسط","committee":"1","seat":"3245507012","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم عبده ابراهيم حدادي","id":"1167266137","class":"الأول المتوسط","committee":"1","seat":"3245507013","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم علي حسن حكمي","id":"1165344407","class":"الأول المتوسط","committee":"1","seat":"3245507014","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم محسن ابراهيم منى","id":"1164017632","class":"الأول المتوسط","committee":"1","seat":"3245507015","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم ياسر علي دعشوش","id":"1174658722","class":"الأول المتوسط","committee":"1","seat":"3245507016","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"احمد حمد حمدان المحياوي","id":"1183399003","class":"الأول المتوسط","committee":"1","seat":"3245507017","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد عبدالله علي الكثيري","id":"1163737289","class":"الثاني المتوسط","committee":"1","seat":"3245508001","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أحمد عمر ابن احمد الزهراني","id":"1160749402","class":"الثاني المتوسط","committee":"1","seat":"3245508002","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أسامه عيسى محمد حدادي","id":"1157954536","class":"الثاني المتوسط","committee":"1","seat":"3245508003","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أنس بشيت عبدالله الشمراني","id":"1160599559","class":"الثاني المتوسط","committee":"1","seat":"3245508004","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أنس محمد بن معيض الزهراني","id":"1161797186","class":"الثاني المتوسط","committee":"1","seat":"3245508005","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أنس ياسين عبدالمعبود باكستاني","id":"2370278505","class":"الثاني المتوسط","committee":"1","seat":"3245508006","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"أوس احمد علي الغبيشي","id":"1160102073","class":"الثاني المتوسط","committee":"1","seat":"3245508007","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"إياد سمير أحمد عزالدين","id":"160228916","class":"الثاني المتوسط","committee":"1","seat":"3245508008","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم احمد ابن محمد القرني","id":"1161919376","class":"الثاني المتوسط","committee":"1","seat":"3245508009","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"ابراهيم محمد بن ابراهيم القرني","id":"1163084401","class":"الثاني المتوسط","committee":"1","seat":"3245508010","classroom":"(1م2)","building":"المبنى الشمالي"},{"name":"احمد زاهر علي باعسيل","id":"1173414424","class":"الأول المتوسط","committee":"2","seat":"3245507018","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد سامي اسماعيل حظاء","id":"1163040700","class":"الأول المتوسط","committee":"2","seat":"3245507019","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد صالح علي الزهراني","id":"1166260479","class":"الأول المتوسط","committee":"2","seat":"3245507020","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد ماجد مشبب القحطاني","id":"1171669839","class":"الأول المتوسط","committee":"2","seat":"3245507021","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد محمد عقال الزهراني","id":"1166792273","class":"الأول المتوسط","committee":"2","seat":"3245507022","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد نايف احمد الزهراني","id":"1165571272","class":"الأول المتوسط","committee":"2","seat":"3245507023","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اسماعيل جبران علي الصامطي","id":"1161245186","class":"الأول المتوسط","committee":"2","seat":"3245507024","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"البراء نايف عبيد السلمي","id":"1171436577","class":"الأول المتوسط","committee":"2","seat":"3245507025","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"الحسين محمد حسن الفتح","id":"4899395117","class":"الأول المتوسط","committee":"2","seat":"3245507026","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"الزهيري محمد ابن الزهيري الحارثي","id":"1167341948","class":"الأول المتوسط","committee":"2","seat":"3245507027","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"الوليد ابراهيم على معشي","id":"1158363471","class":"الأول المتوسط","committee":"2","seat":"3245507028","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"الوليد سعود محسن الزهراني","id":"1163265281","class":"الأول المتوسط","committee":"2","seat":"3245507029","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"امير صالح بن فلاح الزهراني","id":"1166242626","class":"الأول المتوسط","committee":"2","seat":"3245507030","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"انس عبدالهادي عاطف الشهري","id":"1162278061","class":"الأول المتوسط","committee":"2","seat":"3245507031","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اياد حامد احمد الغامدي","id":"1164191627","class":"الأول المتوسط","committee":"2","seat":"3245507032","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اياد حسن محمد السهيلي","id":"1164930032","class":"الأول المتوسط","committee":"2","seat":"3245507033","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اياد خليل الطاهر مصطفى","id":"2370790962","class":"الأول المتوسط","committee":"2","seat":"3245507034","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد حسن عبدالله الجيزاني","id":"1163038878","class":"الثاني المتوسط","committee":"2","seat":"3245508011","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد خالد احمد شمراني","id":"1162994782","class":"الثاني المتوسط","committee":"2","seat":"3245508012","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد خالد عبدالله الحطامي","id":"2320841212","class":"الثاني المتوسط","committee":"2","seat":"3245508013","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد محمد احمد محمد","id":"2361186758","class":"الثاني المتوسط","committee":"2","seat":"3245508014","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد محمد علي خبراني","id":"1159051612","class":"الثاني المتوسط","committee":"2","seat":"3245508015","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد محمود ابن محمد العيسي","id":"1154805657","class":"الثاني المتوسط","committee":"2","seat":"3245508016","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"احمد ناصر احمد الوصابي","id":"2333005748","class":"الثاني المتوسط","committee":"2","seat":"3245508017","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اسامة احمد جارد الدوسري","id":"1161692098","class":"الثاني المتوسط","committee":"2","seat":"3245508018","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"الوليد عيسى غباش المعافي","id":"1162403339","class":"الثاني المتوسط","committee":"2","seat":"3245508019","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"انس أحمد بن عبدالعزيز الحاتمي","id":"1170428567","class":"الثاني المتوسط","committee":"2","seat":"3245508020","classroom":"(1م3)","building":"المبنى الشمالي"},{"name":"اياد عبدالله محمد الحارثي","id":"1166131787","class":"الأول المتوسط","committee":"3","seat":"3245507035","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد عوض محمد القرنى","id":"1163734328","class":"الأول المتوسط","committee":"3","seat":"3245507036","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد محمد علي القرني","id":"1165954726","class":"الأول المتوسط","committee":"3","seat":"3245507037","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد وليد علي هزازي","id":"1164223016","class":"الأول المتوسط","committee":"3","seat":"3245507038","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"باسل جميل عبدالعزيز السلمي","id":"1167601267","class":"الأول المتوسط","committee":"3","seat":"3245507039","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال احمد علي الفقيه","id":"1164549139","class":"الأول المتوسط","committee":"3","seat":"3245507040","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال سعيد علي الزهراني","id":"1166404887","class":"الأول المتوسط","committee":"3","seat":"3245507041","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال عبدالاله سعيد الجهني","id":"1162305898","class":"الأول المتوسط","committee":"3","seat":"3245507042","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال يحيى ملهي طيب","id":"1163468620","class":"الأول المتوسط","committee":"3","seat":"3245507043","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر حسيني محمد ترابه","id":"1166528032","class":"الأول المتوسط","committee":"3","seat":"3245507044","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر سعد لطيف الفايدى","id":"1162834632","class":"الأول المتوسط","committee":"3","seat":"3245507045","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر سلمان حنوني جابري","id":"1164495333","class":"الأول المتوسط","committee":"3","seat":"3245507046","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر محمد ظافر القرني","id":"1166439040","class":"الأول المتوسط","committee":"3","seat":"3245507047","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر محمد عمر الزبيدي","id":"1164747501","class":"الأول المتوسط","committee":"3","seat":"3245507048","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر يحي علي فقيهي","id":"1165644418","class":"الأول المتوسط","committee":"3","seat":"3245507049","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بسام بندر علي الزبيدي","id":"1163478546","class":"الأول المتوسط","committee":"3","seat":"3245507050","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بسام محمد هندى الحارثي","id":"1163098393","class":"الأول المتوسط","committee":"3","seat":"3245507051","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد حسن غالب بارقي","id":"1161593957","class":"الثاني المتوسط","committee":"3","seat":"3245508021","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد سعيد بن محمد الزهراني","id":"1174413763","class":"الثاني المتوسط","committee":"3","seat":"3245508022","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد عبدالله محمد الزهراني","id":"1162605248","class":"الثاني المتوسط","committee":"3","seat":"3245508023","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد عثمان محمد عويس","id":"1159244621","class":"الثاني المتوسط","committee":"3","seat":"3245508024","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"اياد معيض حسين المالكي","id":"1159997020","class":"الثاني المتوسط","committee":"3","seat":"3245508025","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"ايمن جميل عبدالعزيز السلمي","id":"1159857893","class":"الثاني المتوسط","committee":"3","seat":"3245508026","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"ايمن عبدالقادر جعفر حسين","id":"2400351587","class":"الثاني المتوسط","committee":"3","seat":"3245508027","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال انور صالح الحربي","id":"1159925344","class":"الثاني المتوسط","committee":"3","seat":"3245508028","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بتال فارس سراج الحارثي","id":"1159208832","class":"الثاني المتوسط","committee":"3","seat":"3245508029","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بدر علي مهدي القرني","id":"1166199081","class":"الثاني المتوسط","committee":"3","seat":"3245508030","classroom":"(1م4)","building":"المبنى الشمالي"},{"name":"بندر نايف محمد بالعبيد","id":"1165969898","class":"الأول المتوسط","committee":"4","seat":"3245507052","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تامر ابوطاهر جمال الدين امير حسين","id":"2549877948","class":"الأول المتوسط","committee":"4","seat":"3245507053","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي حمد سعيد الجدعاني","id":"1171400391","class":"الأول المتوسط","committee":"4","seat":"3245507054","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي سالم احمد اليامي","id":"12000020400","class":"الأول المتوسط","committee":"4","seat":"3245507055","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي عبدالرحمن علي الغامدي","id":"1164345041","class":"الأول المتوسط","committee":"4","seat":"3245507056","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي فيصل شامي الشهري","id":"1163313891","class":"الأول المتوسط","committee":"4","seat":"3245507057","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي ماجد عبدالرحمن الاسمري","id":"1164842674","class":"الأول المتوسط","committee":"4","seat":"3245507058","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تميم يحي علي المالكي","id":"1167200383","class":"الأول المتوسط","committee":"4","seat":"3245507059","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"ثامر اسامه احمد راجحي","id":"1166963668","class":"الأول المتوسط","committee":"4","seat":"3245507060","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جابر علي بن جابر الشمراني","id":"1161941057","class":"الأول المتوسط","committee":"4","seat":"3245507061","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جاسم عبدالله مخاسر الشمراني","id":"1163485897","class":"الأول المتوسط","committee":"4","seat":"3245507062","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جسار عزالدين علي حدادي","id":"1165182203","class":"الأول المتوسط","committee":"4","seat":"3245507063","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جميل عبدالرحمن علي الزهراني","id":"1166521219","class":"الأول المتوسط","committee":"4","seat":"3245507064","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جواد سالم أحمد العماري","id":"1162487845","class":"الأول المتوسط","committee":"4","seat":"3245507065","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حاتم احمد بن عوضه الزهراني","id":"1164805291","class":"الأول المتوسط","committee":"4","seat":"3245507066","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حاتم احمد عوضه الزهراني","id":"1165020932","class":"الأول المتوسط","committee":"4","seat":"3245507067","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حامد حمد علي الزبيدى","id":"1165278415","class":"الأول المتوسط","committee":"4","seat":"3245507068","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"بدر محمد بن هاجد العصيمي","id":"1161077928","class":"الثاني المتوسط","committee":"4","seat":"3245508031","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"بسام ابراهيم مرعي النعمي","id":"1160794739","class":"الثاني المتوسط","committee":"4","seat":"3245508032","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"بسام احمد علي الشهري","id":"1153545205","class":"الثاني المتوسط","committee":"4","seat":"3245508033","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"بسام يحي يحي قيس","id":"1157993278","class":"الثاني المتوسط","committee":"4","seat":"3245508034","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي سلطان عبدالله مجرشي","id":"1161828635","class":"الثاني المتوسط","committee":"4","seat":"3245508035","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"تركي صالح عبدالله عويد","id":"4443332221","class":"الثاني المتوسط","committee":"4","seat":"3245508036","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جابر نافع جابر العمري","id":"1152788343","class":"الثاني المتوسط","committee":"4","seat":"3245508037","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جسار محمد طوير العاصمي","id":"1161920119","class":"الثاني المتوسط","committee":"4","seat":"3245508038","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جمعان عبدالله جمعان الزهراني","id":"1160878185","class":"الثاني المتوسط","committee":"4","seat":"3245508039","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جميل أشفاق مولوى نجم الدين","id":"2375898133","class":"الثاني المتوسط","committee":"4","seat":"3245508040","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جهاد علي ابراهيم هبل","id":"160231506","class":"الثاني المتوسط","committee":"4","seat":"3245508041","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جواد عبدالعزيز سعيد الزهراني","id":"1165355577","class":"الثاني المتوسط","committee":"4","seat":"3245508042","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جواد عبيد بن محمد الحاتمي","id":"1159856036","class":"الثاني المتوسط","committee":"4","seat":"3245508043","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"جودالله عجلان جودالله القرني","id":"1160050884","class":"الثاني المتوسط","committee":"4","seat":"3245508044","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حازم دعيشي محمد مبروك","id":"1160430581","class":"الثاني المتوسط","committee":"4","seat":"3245508045","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حازم عيسى قاسم خشوري","id":"1168641494","class":"الثاني المتوسط","committee":"4","seat":"3245508046","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حسام حسن محمد الزبيدي","id":"1191729175","class":"الثاني المتوسط","committee":"4","seat":"3245508047","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حسام محمد بن سرحان الشمراني","id":"1162673295","class":"الثاني المتوسط","committee":"4","seat":"3245508048","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حسان يونس مقبول حسين","id":"2418222952","class":"الثاني المتوسط","committee":"4","seat":"3245508049","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حسين عبدالله حسين العامري","id":"2383817398","class":"الثاني المتوسط","committee":"4","seat":"3245508050","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حمد عبدالله حمد الرفاعي","id":"1179982994","class":"الثاني المتوسط","committee":"4","seat":"3245508051","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حمد علي عبدالله الكناني","id":"1160293799","class":"الثاني المتوسط","committee":"4","seat":"3245508052","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حمد منصور حامد الشمراني","id":"1167184348","class":"الثاني المتوسط","committee":"4","seat":"3245508053","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حمدان بن حميد بن حمدان العديني","id":"1160520746","class":"الثاني المتوسط","committee":"4","seat":"3245508054","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حميد سعد حميد العبسي","id":"1159799715","class":"الثاني المتوسط","committee":"4","seat":"3245508055","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"خالد احمد محمد الحارثي","id":"1161901010","class":"الثاني المتوسط","committee":"4","seat":"3245508056","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"خالد خلف سودان الزهراني","id":"1158992022","class":"الثاني المتوسط","committee":"4","seat":"3245508057","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"خالد سلطان محمد بلال","id":"1161687478","class":"الثاني المتوسط","committee":"4","seat":"3245508058","classroom":"(1م5)","building":"المبنى الشمالي"},{"name":"حامد طلال حامد الخضيري","id":"1162973117","class":"الأول المتوسط","committee":"5","seat":"3245507069","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسام سالم جابر الشهري","id":"1164066225","class":"الأول المتوسط","committee":"5","seat":"3245507070","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسام طارق ابن سعيد الغامدي","id":"1163773755","class":"الأول المتوسط","committee":"5","seat":"3245507071","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن حافظ حسن كعبي","id":"1166571800","class":"الأول المتوسط","committee":"5","seat":"3245507072","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن سعد بن حسن الغامدي","id":"1166430619","class":"الأول المتوسط","committee":"5","seat":"3245507073","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن عبدالله بالخير القرني","id":"1164244616","class":"الأول المتوسط","committee":"5","seat":"3245507074","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن عبدالله حسن الزهراني","id":"1161987456","class":"الأول المتوسط","committee":"5","seat":"3245507075","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن عبدالله محمد الشهري","id":"1164041046","class":"الأول المتوسط","committee":"5","seat":"3245507076","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حسن علي حسن الربعي","id":"1165100205","class":"الأول المتوسط","committee":"5","seat":"3245507077","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حمد حميد احمد الهلالي","id":"1166180792","class":"الأول المتوسط","committee":"5","seat":"3245507078","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حمد سليمان محمد حكمي","id":"1163083874","class":"الأول المتوسط","committee":"5","seat":"3245507079","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"حمد محمد عزيز العتيبي","id":"1167633849","class":"الأول المتوسط","committee":"5","seat":"3245507080","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد احمد الحسن المش","id":"1163946294","class":"الأول المتوسط","committee":"5","seat":"3245507081","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد احمد سعيد الشهري","id":"1165589696","class":"الأول المتوسط","committee":"5","seat":"3245507082","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد تيسير حسني المزين","id":"2357776091","class":"الأول المتوسط","committee":"5","seat":"3245507083","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد حسن حمزه الاسطى","id":"1161315708","class":"الأول المتوسط","committee":"5","seat":"3245507084","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد حسن عبدالله القحطاني","id":"1166019693","class":"الأول المتوسط","committee":"5","seat":"3245507085","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد عثمان بن شريز المالكي","id":"1161055759","class":"الثاني المتوسط","committee":"5","seat":"3245508059","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد على بن احمد المنتشري","id":"1161369218","class":"الثاني المتوسط","committee":"5","seat":"3245508060","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد علي يعن الله الحارثي","id":"1158515633","class":"الثاني المتوسط","committee":"5","seat":"3245508061","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد فيصل مبروك مبروك","id":"1160665095","class":"الثاني المتوسط","committee":"5","seat":"3245508062","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد ماجد خليفه الثقفي","id":"1150727020","class":"الثاني المتوسط","committee":"5","seat":"3245508063","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد محمد بن شامي الصحبي","id":"1160322010","class":"الثاني المتوسط","committee":"5","seat":"3245508064","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"داؤود ماجد حسن ضعاني","id":"1160871792","class":"الثاني المتوسط","committee":"5","seat":"3245508065","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ذياب عاصم عبده صالح","id":"2493294868","class":"الثاني المتوسط","committee":"5","seat":"3245508066","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رائد لافي عيضه الحارثي","id":"1161909294","class":"الثاني المتوسط","committee":"5","seat":"3245508067","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راجح حامد راجح الزبيدي","id":"1159902368","class":"الثاني المتوسط","committee":"5","seat":"3245508068","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راشد اديب عمر ابوعيران","id":"1158780567","class":"الثاني المتوسط","committee":"5","seat":"3245508069","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان تركي زائد الغامدي","id":"1158892081","class":"الثاني المتوسط","committee":"5","seat":"3245508070","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان زين سعيد الزبيدي","id":"1162447005","class":"الثاني المتوسط","committee":"5","seat":"3245508071","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان سعيد محمد الشمراني","id":"1168522298","class":"الثاني المتوسط","committee":"5","seat":"3245508072","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان طارق علي البسيسي","id":"1160736417","class":"الثاني المتوسط","committee":"5","seat":"3245508073","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان ناصر بن محمد كرشمي","id":"1160665947","class":"الثاني المتوسط","committee":"5","seat":"3245508074","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رياض عبدالله بن أحمد المالكي","id":"1173519321","class":"الثاني المتوسط","committee":"5","seat":"3245508075","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رياض محمد سعيد الشمراني","id":"1178129530","class":"الثاني المتوسط","committee":"5","seat":"3245508076","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ريان منصور حفظ الله صالح","id":"2326147408","class":"الثاني المتوسط","committee":"5","seat":"3245508077","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"زياد جابر علي صلهبي","id":"1162806267","class":"الثاني المتوسط","committee":"5","seat":"3245508078","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"زياد حمدان عطيه الزهراني","id":"1163489758","class":"الثاني المتوسط","committee":"5","seat":"3245508079","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"زياد سعد مفرح الشهري","id":"1167035987","class":"الثاني المتوسط","committee":"5","seat":"3245508080","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"زياد عثمان محمد عويس","id":"1163670282","class":"الثاني المتوسط","committee":"5","seat":"3245508081","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"زياد ماجد معيض المطيري","id":"1161680648","class":"الثاني المتوسط","committee":"5","seat":"3245508082","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سالم سلطان سالم الزهراني","id":"1160114003","class":"الثاني المتوسط","committee":"5","seat":"3245508083","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سالم عوض عبدربه المصعبي","id":"2343791154","class":"الثاني المتوسط","committee":"5","seat":"3245508084","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سالم محمد سالم الحربي","id":"1159187630","class":"الثاني المتوسط","committee":"5","seat":"3245508085","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سامر جابر سعد الشمراني","id":"1165254465","class":"الثاني المتوسط","committee":"5","seat":"3245508086","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد سعيد بن جلعود القحطاني","id":"1164538454","class":"الأول المتوسط","committee":"6","seat":"3245507086","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد صالح ابن بلغيث العامري","id":"1167452737","class":"الأول المتوسط","committee":"6","seat":"3245507087","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد عابد عيضه الزهراني","id":"1171751553","class":"الأول المتوسط","committee":"6","seat":"3245507088","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خالد عبدالهادي مبشر العنزي","id":"1165563246","class":"الأول المتوسط","committee":"6","seat":"3245507089","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"خطاب بن سلطان بن حمود المقاطي العتيبي","id":"1165601848","class":"الأول المتوسط","committee":"6","seat":"3245507090","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"داوود جمعان ابن محمد الزهراني","id":"1162309684","class":"الأول المتوسط","committee":"6","seat":"3245507091","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رائد حسن موسى هزازي","id":"1164275974","class":"الأول المتوسط","committee":"6","seat":"3245507092","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رائد مفرح مسعود الفيفي","id":"1165604602","class":"الأول المتوسط","committee":"6","seat":"3245507093","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان فهد يحي الزهراني","id":"1155836842","class":"الأول المتوسط","committee":"6","seat":"3245507094","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"راكان هاشم عبدالله الصعب","id":"1167306792","class":"الأول المتوسط","committee":"6","seat":"3245507095","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رامي اديب عمر ابوعيران","id":"1166151231","class":"الأول المتوسط","committee":"6","seat":"3245507096","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رواد حسن محمد خرشان","id":"1164437616","class":"الأول المتوسط","committee":"6","seat":"3245507097","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رواد عبده علي مجرشي","id":"1166346351","class":"الأول المتوسط","committee":"6","seat":"3245507098","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"رواد مسعد زاهر الثعلبي","id":"1166461580","class":"الأول المتوسط","committee":"6","seat":"3245507099","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ريان سالم علي القنفذي","id":"1163125436","class":"الأول المتوسط","committee":"6","seat":"3245507100","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ريان عبدالله محمد الزهراني","id":"1164061184","class":"الأول المتوسط","committee":"6","seat":"3245507101","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ريان علي احمد شيبان","id":"1162149916","class":"الأول المتوسط","committee":"6","seat":"3245507102","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سامي عبدالرحمن محمد القرني","id":"1196068405","class":"الثاني المتوسط","committee":"6","seat":"3245508087","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سامي علي سعيد قيسي","id":"1164831198","class":"الثاني المتوسط","committee":"6","seat":"3245508088","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سامي عواض غويزي العصيمي","id":"1155732298","class":"الثاني المتوسط","committee":"6","seat":"3245508089","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سعد عبدالعزيز سعد القرني","id":"1159396983","class":"الثاني المتوسط","committee":"6","seat":"3245508090","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سعيد صالح بن مساعد الزهراني","id":"1161680614","class":"الثاني المتوسط","committee":"6","seat":"3245508091","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلطان دوخي عبيد البقمي","id":"1160945992","class":"الثاني المتوسط","committee":"6","seat":"3245508092","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلطان سامي علي شماخ","id":"2339121150","class":"الثاني المتوسط","committee":"6","seat":"3245508093","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلطان عواض غويزي العصيمي","id":"1161916539","class":"الثاني المتوسط","committee":"6","seat":"3245508094","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلطان فهد سعيد الزهراني","id":"1161897937","class":"الثاني المتوسط","committee":"6","seat":"3245508095","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلطان محمد محمد المسبحي","id":"4164786966-3","class":"الثاني المتوسط","committee":"6","seat":"3245508096","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلمان احمد حمدان المالكى","id":"1166553352","class":"الثاني المتوسط","committee":"6","seat":"3245508097","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلمان عبدالمجيد خميس الزهراني","id":"1161645930","class":"الثاني المتوسط","committee":"6","seat":"3245508098","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سلمان يحي بن ذاكر عسيرى","id":"1162360521","class":"الثاني المتوسط","committee":"6","seat":"3245508099","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سليم سليمان سليم الجبيري","id":"1169310255","class":"الثاني المتوسط","committee":"6","seat":"3245508100","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سليمان علي موسى الحربي","id":"1150205134","class":"الثاني المتوسط","committee":"6","seat":"3245508101","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"سليمان هاني سليمان القحرى","id":"1161292196","class":"الثاني المتوسط","committee":"6","seat":"3245508102","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"شجاع طلال شجاع العتيبي","id":"1162098683","class":"الثاني المتوسط","committee":"6","seat":"3245508103","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"صقر حسن عبدالرحمن الزهراني","id":"1160834170","class":"الثاني المتوسط","committee":"6","seat":"3245508104","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"طلال حسن محمد الزبيدي","id":"1160523898","class":"الثاني المتوسط","committee":"6","seat":"3245508105","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"طلال ياسر طلال حجازي","id":"1170905671","class":"الثاني المتوسط","committee":"6","seat":"3245508106","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عادل علي محمد هزازي","id":"1161399140","class":"الثاني المتوسط","committee":"6","seat":"3245508107","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عاصم عصام عبدالرقيب عماد","id":"9683750200","class":"الثاني المتوسط","committee":"6","seat":"3245508108","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عامر حسن عامر الشهري","id":"1163737487","class":"الثاني المتوسط","committee":"6","seat":"3245508109","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عبد الله فهد عبد الله الزهراني","id":"1189261843","class":"الثاني المتوسط","committee":"6","seat":"3245508110","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عبد المجيد محمد احمد بشكيري","id":"2331737474","class":"الثاني المتوسط","committee":"6","seat":"3245508111","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عبدالاله احمد علي آل فايع","id":"1162632929","class":"الثاني المتوسط","committee":"6","seat":"3245508112","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عبدالحفيظ ابراهيم عبدالحفيظ رويسي","id":"1161022502","class":"الثاني المتوسط","committee":"6","seat":"3245508113","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"عبدالرحمن اسماعيل عبدالرحمن علي","id":"2418090938","class":"الثاني المتوسط","committee":"6","seat":"3245508114","classroom":"(1م7)","building":"المبنى الشمالي"},{"name":"ريان فايز مسلم الرشيدي","id":"1163227364","class":"الأول المتوسط","committee":"7","seat":"3245507103","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"ريان محمد عبدالله عسيري","id":"1167119161","class":"الأول المتوسط","committee":"7","seat":"3245507104","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"زياد حامد احمد الغامدي","id":"1164191619","class":"الأول المتوسط","committee":"7","seat":"3245507105","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"زياد سامي محمد حكمي","id":"2358822530","class":"الأول المتوسط","committee":"7","seat":"3245507106","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"زياد مشعل بن حمد الحارثي","id":"1166789907","class":"الأول المتوسط","committee":"7","seat":"3245507107","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"زيد ابن عبد الوهاب بن علي بن عقال الح الزهراني","id":"1164295725","class":"الأول المتوسط","committee":"7","seat":"3245507108","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"زين محمد زين الزبيدي","id":"1162606014","class":"الأول المتوسط","committee":"7","seat":"3245507109","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سالم سعد سالم الزهراني","id":"1165819572","class":"الأول المتوسط","committee":"7","seat":"3245507110","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سامر احمد بن محمداسعد مستت","id":"1163340530","class":"الأول المتوسط","committee":"7","seat":"3245507111","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سامر سمير عبدالله الجابري","id":"1177922273","class":"الأول المتوسط","committee":"7","seat":"3245507112","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد احمد عمار الشمراني","id":"1163644162","class":"الأول المتوسط","committee":"7","seat":"3245507113","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد سعيد سعد البيشي","id":"1166278034","class":"الأول المتوسط","committee":"7","seat":"3245507114","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد سلطان سعد الشهراني","id":"1165492602","class":"الأول المتوسط","committee":"7","seat":"3245507115","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد علان بن محمد العرياني","id":"1163757956","class":"الأول المتوسط","committee":"7","seat":"3245507116","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد عمار سعد الشمراني","id":"1161952823","class":"الأول المتوسط","committee":"7","seat":"3245507117","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعد هاني محمد العبادي","id":"1163867383","class":"الأول المتوسط","committee":"7","seat":"3245507118","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعود بعسوس بن عبدالله السهمي","id":"1164491712","class":"الأول المتوسط","committee":"7","seat":"3245507119","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن بخان بن يعن الله الغامدي","id":"1159615580","class":"الثاني المتوسط","committee":"7","seat":"3245508115","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن بشير ابراهيم بشير","id":"1161957756","class":"الثاني المتوسط","committee":"7","seat":"3245508116","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن حبيب الله فياض الاسلام حافظ","id":"2434388357","class":"الثاني المتوسط","committee":"7","seat":"3245508117","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن حسن عبدالرحمن الشهري","id":"1162873598","class":"الثاني المتوسط","committee":"7","seat":"3245508118","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن حسين حسن دغريري","id":"1161965759","class":"الثاني المتوسط","committee":"7","seat":"3245508119","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن سعد مرزوق الجدعاني","id":"1158739928","class":"الثاني المتوسط","committee":"7","seat":"3245508120","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن سلمان عابد الزنبقي","id":"1163263971","class":"الثاني المتوسط","committee":"7","seat":"3245508121","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن عبدالله سالم فتيني","id":"2381665492","class":"الثاني المتوسط","committee":"7","seat":"3245508122","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن عزالدين عبده الشريف","id":"160482764","class":"الثاني المتوسط","committee":"7","seat":"3245508123","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"عبدالرحمن عماد بن غريب الينبعاوي","id":"1158611051","class":"الثاني المتوسط","committee":"7","seat":"3245508124","classroom":"(1م6)","building":"المبنى الشمالي"},{"name":"سعود تركي محمد باوزير","id":"1192463527","class":"الأول المتوسط","committee":"8","seat":"3245507120","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعود سلطان مفرح الاسمري","id":"1163568270","class":"الأول المتوسط","committee":"8","seat":"3245507121","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعود عبدالرحمن بن محمد الغامدي","id":"1166565786","class":"الأول المتوسط","committee":"8","seat":"3245507122","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعود علي احمد آل سالم","id":"1163576133","class":"الأول المتوسط","committee":"8","seat":"3245507123","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعود محمد عبده آل مسعود","id":"1164225649","class":"الأول المتوسط","committee":"8","seat":"3245507124","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعيد احمد سعيد الزهراني","id":"1165014265","class":"الأول المتوسط","committee":"8","seat":"3245507125","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعيد الحسن سعيد العامري","id":"1163496183","class":"الأول المتوسط","committee":"8","seat":"3245507126","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سعيد علي سعيد العمري","id":"1165185917","class":"الأول المتوسط","committee":"8","seat":"3245507127","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان احمد رمضان الزهراني","id":"1164203885","class":"الأول المتوسط","committee":"8","seat":"3245507128","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان عبده محمد عقيلي","id":"1165693829","class":"الأول المتوسط","committee":"8","seat":"3245507129","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان محمد بخيت الزهراني","id":"1161538853","class":"الأول المتوسط","committee":"8","seat":"3245507130","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان محمد بن سعد العفاري","id":"1159822905","class":"الأول المتوسط","committee":"8","seat":"3245507131","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان محمد بن عبدالله القرني","id":"1164620229","class":"الأول المتوسط","committee":"8","seat":"3245507132","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان ناصر عوض عسيري","id":"1164510776","class":"الأول المتوسط","committee":"8","seat":"3245507133","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلطان يحي بن ذاكر عسيرى","id":"1167264801","class":"الأول المتوسط","committee":"8","seat":"3245507134","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سلمان سليمان احمد البيشي","id":"1162604100","class":"الأول المتوسط","committee":"8","seat":"3245507135","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"سليمان مرعي شامي السلامي","id":"1175685633","class":"الأول المتوسط","committee":"8","seat":"3245507136","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن فواز - امير حسين","id":"2388560696","class":"الثاني المتوسط","committee":"8","seat":"3245508125","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن محمد مفرح الأسمري","id":"1162040040","class":"الثاني المتوسط","committee":"8","seat":"3245508126","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالرحيم حبيب الله فياض الاسلام حافظ","id":"2434388555","class":"الثاني المتوسط","committee":"8","seat":"3245508127","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالستار عبدالحليم عبده شوقي","id":"160786723","class":"الثاني المتوسط","committee":"8","seat":"3245508128","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز حسن بن ابكر جميل","id":"1161029176","class":"الثاني المتوسط","committee":"8","seat":"3245508129","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز زين ابن مساعد الشيخي","id":"1169442231","class":"الثاني المتوسط","committee":"8","seat":"3245508130","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز عبدالرحمن علي الحربي","id":"1161056815","class":"الثاني المتوسط","committee":"8","seat":"3245508131","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز علي ابراهيم الصقر","id":"1163328360","class":"الثاني المتوسط","committee":"8","seat":"3245508132","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز علي محمد حمدي","id":"1160101521","class":"الثاني المتوسط","committee":"8","seat":"3245508133","classroom":"(2م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز فهد علي النخالي","id":"1160522379","class":"الثاني المتوسط","committee":"8","seat":"3245508134","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"سيف نشمي مسعد العتيبي","id":"1159869419","class":"الأول المتوسط","committee":"9","seat":"3245507137","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"صالح بن علي بن صالح الراشدي","id":"1161470651","class":"الأول المتوسط","committee":"9","seat":"3245507138","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عالي محمد عبدالله القرني","id":"1158011609","class":"الأول المتوسط","committee":"9","seat":"3245507139","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبد الله محمد سعيد الغامدي","id":"1164525501","class":"الأول المتوسط","committee":"9","seat":"3245507140","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالاله حسن علي زيد","id":"1166711562","class":"الأول المتوسط","committee":"9","seat":"3245507141","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالاله فهد سالم القثمي","id":"1165113034","class":"الأول المتوسط","committee":"9","seat":"3245507142","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالاله محمد بن حمزه البارقي","id":"1166786648","class":"الأول المتوسط","committee":"9","seat":"3245507143","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالاله ناصر سعيد القحطاني","id":"1172967307","class":"الأول المتوسط","committee":"9","seat":"3245507144","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالحي حمود ابراهيم القوزي","id":"1165632322","class":"الأول المتوسط","committee":"9","seat":"3245507145","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن حمزه ابراهيم الغامدي","id":"1165909332","class":"الأول المتوسط","committee":"9","seat":"3245507146","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن عادل علي الرويثي","id":"1157308857","class":"الأول المتوسط","committee":"9","seat":"3245507147","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن محمد احمد مجرشي","id":"1162301681","class":"الأول المتوسط","committee":"9","seat":"3245507148","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن محمد جابر عسيري","id":"1161875404","class":"الأول المتوسط","committee":"9","seat":"3245507149","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن مرضي بن شنان الزهراني","id":"1164432187","class":"الأول المتوسط","committee":"9","seat":"3245507150","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالرحمن مرعي حمد الكيادي","id":"1187029630","class":"الأول المتوسط","committee":"9","seat":"3245507151","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز احمد حسن الشهري","id":"1165487198","class":"الأول المتوسط","committee":"9","seat":"3245507152","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز اديب علي جبريل","id":"1164393033","class":"الأول المتوسط","committee":"9","seat":"3245507153","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز راجح عطيه الزبيدي","id":"1165184738","class":"الأول المتوسط","committee":"9","seat":"3245507154","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز سالم عدنان محروس","id":"1164478545","class":"الأول المتوسط","committee":"9","seat":"3245507155","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز سلمان مسلم الصاعدي","id":"1194589675","class":"الأول المتوسط","committee":"9","seat":"3245507156","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز سليمان حمد الزبيدي","id":"1163315979","class":"الأول المتوسط","committee":"9","seat":"3245507157","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز عبدالرحمن عبدالله الشمراني","id":"1166517597","class":"الأول المتوسط","committee":"9","seat":"3245507158","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز عبدالله بن محمد القرني","id":"1163378787","class":"الأول المتوسط","committee":"9","seat":"3245507159","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز ماجد احمد دحمان","id":"1167099645","class":"الأول المتوسط","committee":"9","seat":"3245507160","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز محمد احمد الاشول","id":"1163091554","class":"الأول المتوسط","committee":"9","seat":"3245507161","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز محمد جبير الحربي","id":"1164542027","class":"الأول المتوسط","committee":"9","seat":"3245507162","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز محمد حسن زيلع","id":"1163115130","class":"الأول المتوسط","committee":"9","seat":"3245507163","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز يوسف عبدالقادر صباغ","id":"150234020","class":"الأول المتوسط","committee":"9","seat":"3245507164","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز ماجد قاسم هزازي","id":"1162208126","class":"الثاني المتوسط","committee":"9","seat":"3245508135","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز محمد بن عبدالله العلياني","id":"1161708514","class":"الثاني المتوسط","committee":"9","seat":"3245508136","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز محمد حمدان الحربي","id":"1161154453","class":"الثاني المتوسط","committee":"9","seat":"3245508137","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالعزيز يحي علي منى","id":"1165343623","class":"الثاني المتوسط","committee":"9","seat":"3245508138","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبداللطيف محمد موسى الهوسه","id":"1161890494","class":"الثاني المتوسط","committee":"9","seat":"3245508139","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله احمد عبداللة بامحرم","id":"1157869056","class":"الثاني المتوسط","committee":"9","seat":"3245508140","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله احمد عبدالله الصمداني","id":"1160417455","class":"الثاني المتوسط","committee":"9","seat":"3245508141","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله حسن عبدالله الشاردي","id":"1158727881","class":"الثاني المتوسط","committee":"9","seat":"3245508142","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله عبدالرحمن عبدالله الحربي","id":"1156084301","class":"الثاني المتوسط","committee":"9","seat":"3245508143","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله مانع بن صالح بالحارث","id":"1162946295","class":"الثاني المتوسط","committee":"9","seat":"3245508144","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله محمد ابكر مصطفى","id":"2446802452","class":"الثاني المتوسط","committee":"9","seat":"3245508145","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالله بن احمد بن سعيد الزهراني","id":"1161791148","class":"الثاني المتوسط","committee":"9","seat":"3245508146","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عبدالمجيد فهد حمد طواشي","id":"1161587058","class":"الثاني المتوسط","committee":"9","seat":"3245508147","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"عدنان عبدالله عايض الاسمري","id":"1158234490","class":"الثاني المتوسط","committee":"9","seat":"3245508148","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"علي احمد علي العرياني","id":"1160448252","class":"الثاني المتوسط","committee":"9","seat":"3245508149","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"علي احمد علي العمري","id":"1163133505","class":"الثاني المتوسط","committee":"9","seat":"3245508150","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"علي الحسن علي السياغي","id":"2333870026","class":"الثاني المتوسط","committee":"9","seat":"3245508151","classroom":"(1م8)","building":"المبنى الشمالي"},{"name":"أحمد سمير أحمد عزالدين","id":"160228918","class":"الثالث المتوسط","committee":"10","seat":"3245509001","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"أحمد عبدالرحمن زاهر الشهري","id":"1151731518","class":"الثالث المتوسط","committee":"10","seat":"3245509002","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"أحمد محمد الحسين ال السادة","id":"1156223057","class":"الثالث المتوسط","committee":"10","seat":"3245509003","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"أمير احمد علي العرياني","id":"1158235000","class":"الثالث المتوسط","committee":"10","seat":"3245509004","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"أنس سعيد ابراهيم القوزي","id":"1149652131","class":"الثالث المتوسط","committee":"10","seat":"3245509005","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"أنس علي محمد القرني","id":"1154536294","class":"الثالث المتوسط","committee":"10","seat":"3245509006","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"ابراهيم العمرى احمد غودرى","id":"1152205405","class":"الثالث المتوسط","committee":"10","seat":"3245509007","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"ابراهيم حسن ابراهيم ربيعي","id":"1159263837","class":"الثالث المتوسط","committee":"10","seat":"3245509008","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"ابراهيم شعبان زبيدي سالم","id":"1025488888585","class":"الثالث المتوسط","committee":"10","seat":"3245509009","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد حامد احمد الغامدي","id":"1158401867","class":"الثالث المتوسط","committee":"10","seat":"3245509010","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد حسين احمد نذيراحمد فضل الرحمن","id":"2318714793","class":"الثالث المتوسط","committee":"10","seat":"3245509011","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد خالد احمد العبدلي","id":"1159070430","class":"الثالث المتوسط","committee":"10","seat":"3245509012","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد راشد عبدالله الزهراني","id":"1168494266","class":"الثالث المتوسط","committee":"10","seat":"3245509013","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد سمحان عبدالله الشمراني","id":"1169305818","class":"الثالث المتوسط","committee":"10","seat":"3245509014","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد سند محمد سبلان","id":"2309431514","class":"الثالث المتوسط","committee":"10","seat":"3245509015","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد صابر بن عبدالله الشريف","id":"1157140474","class":"الثالث المتوسط","committee":"10","seat":"3245509016","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد عابد احمد القرني","id":"1160719413","class":"الثالث المتوسط","committee":"10","seat":"3245509017","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد عبدالله احمد الزهراني","id":"1157244003","class":"الثالث المتوسط","committee":"10","seat":"3245509018","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد عبدالله احمد العيسى","id":"1155214826","class":"الثالث المتوسط","committee":"10","seat":"3245509019","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد عبدالله علي المرحبي","id":"1154861148","class":"الثالث المتوسط","committee":"10","seat":"3245509020","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"احمد عثمان ابن احمد الناشري","id":"1157385657","class":"الثالث المتوسط","committee":"10","seat":"3245509021","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اسامه عبدالوهاب محمد سيد احمد","id":"2350353336","class":"الثالث المتوسط","committee":"10","seat":"3245509022","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اسماعيل عبدالعزيز قاسم سالم","id":"6055982748","class":"الثالث المتوسط","committee":"10","seat":"3245509023","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اصيل محمد سعيد القرني","id":"1159169752","class":"الثالث المتوسط","committee":"10","seat":"3245509024","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"الياس سمير عبدالرحمن زبيدي","id":"2319471534","class":"الثالث المتوسط","committee":"10","seat":"3245509025","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"الياس شريف محمد النهاري","id":"2386307959","class":"الثالث المتوسط","committee":"10","seat":"3245509026","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"امجد احمد لقمان حكيم صديق","id":"2411531268","class":"الثالث المتوسط","committee":"10","seat":"3245509027","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"امير ناهض ابراهيم ابو رجيله","id":"2331468187","class":"الثالث المتوسط","committee":"10","seat":"3245509028","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"امين سليمان محمد مباركي","id":"1156676080","class":"الثالث المتوسط","committee":"10","seat":"3245509029","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"انس حسن بن صالح الزهراني","id":"1156587501","class":"الثالث المتوسط","committee":"10","seat":"3245509030","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اياد ابراهيم محمد الفلاحي","id":"1157801331","class":"الثالث المتوسط","committee":"10","seat":"3245509031","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اياد احمد ابراهيم زهراني","id":"1155038209","class":"الثالث المتوسط","committee":"10","seat":"3245509032","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اياد سعد علي ال شعثان","id":"1155352840","class":"الثالث المتوسط","committee":"10","seat":"3245509033","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اياد محمد ابن عبدالمجيد بيفاري","id":"1154684581","class":"الثالث المتوسط","committee":"10","seat":"3245509034","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"اياد محمد زايد الزهراني","id":"1157430966","class":"الثالث المتوسط","committee":"10","seat":"3245509035","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"باسل عبيد عبدالله الحربي","id":"1150785192","class":"الثالث المتوسط","committee":"10","seat":"3245509036","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"بدر خالد بن حاضر القرني","id":"1154812679","class":"الثالث المتوسط","committee":"10","seat":"3245509037","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"تركي عبدالمحسن بن حاسن المالكي","id":"1152430912","class":"الثالث المتوسط","committee":"10","seat":"3245509038","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"تركي محمد بن ابراهيم عريشي","id":"1158464501","class":"الثالث المتوسط","committee":"10","seat":"3245509039","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"تركي محمد عبدالله العامري","id":"1158072205","class":"الثالث المتوسط","committee":"10","seat":"3245509040","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"تركي مرزوق بن غالي المطيري","id":"1155816752","class":"الثالث المتوسط","committee":"10","seat":"3245509041","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"ثامر ابراهيم حسن العيافي","id":"1153974728","class":"الثالث المتوسط","committee":"10","seat":"3245509042","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"جابر راشد احمد العمري","id":"1156638742","class":"الثالث المتوسط","committee":"10","seat":"3245509043","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"حاتم حيدر بن احمد السهيمي","id":"1156261586","class":"الثالث المتوسط","committee":"10","seat":"3245509044","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"حبيب حسن رشيد أحمد أحمد","id":"2388152189","class":"الثالث المتوسط","committee":"10","seat":"3245509045","classroom":"(2م1)","building":"المبنى الشمالي"},{"name":"حسام عصام صالح مقراض","id":"160232253","class":"الثالث المتوسط","committee":"11","seat":"3245509046","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسام يونس مقبول حسين","id":"2418222226","class":"الثالث المتوسط","committee":"11","seat":"3245509047","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسان عبدالله ابن محمد العلياني","id":"1157478114","class":"الثالث المتوسط","committee":"11","seat":"3245509048","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسن علي حسن العمري","id":"1156357889","class":"الثالث المتوسط","committee":"11","seat":"3245509049","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسن عمر حسن حمض","id":"1155998238","class":"الثالث المتوسط","committee":"11","seat":"3245509050","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسين ابوبكر حسين عبدالله","id":"2414058608","class":"الثالث المتوسط","committee":"11","seat":"3245509051","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسين عبدالله ابن محمد الجهني","id":"1156390468","class":"الثالث المتوسط","committee":"11","seat":"3245509052","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حسين ناصر عبده مسرحى","id":"1153394836","class":"الثالث المتوسط","committee":"11","seat":"3245509053","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حمد سلمان مغنم الشمراني","id":"1155592122","class":"الثالث المتوسط","committee":"11","seat":"3245509054","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حمزة احمد هاشم راجح","id":"160232261","class":"الثالث المتوسط","committee":"11","seat":"3245509055","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"حميد محمد نور حميد الله عمر فاروق","id":"2416804389","class":"الثالث المتوسط","committee":"11","seat":"3245509056","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"خالد سامي علي هزازي","id":"1157221084","class":"الثالث المتوسط","committee":"11","seat":"3245509057","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"خالد مصطفى جابر الصبياني","id":"1155594532","class":"الثالث المتوسط","committee":"11","seat":"3245509058","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"رائد سلطان جمعان الزهراني","id":"1166656593","class":"الثالث المتوسط","committee":"11","seat":"3245509059","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"رائد عبدالله ابن عبده المرحبي","id":"1157726322","class":"الثالث المتوسط","committee":"11","seat":"3245509060","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان ابراهيم محمد مجدلي","id":"1155068057","class":"الثالث المتوسط","committee":"11","seat":"3245509061","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان حمدان محمد المالكي","id":"1159955531","class":"الثالث المتوسط","committee":"11","seat":"3245509062","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان ردعان سالم العمري","id":"1159053188","class":"الثالث المتوسط","committee":"11","seat":"3245509063","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان عبدالله علي الزهراني","id":"1159609948","class":"الثالث المتوسط","committee":"11","seat":"3245509064","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان علي حسين محجب","id":"2431372248","class":"الثالث المتوسط","committee":"11","seat":"3245509065","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"راكان محمد زين القرني","id":"1158451003","class":"الثالث المتوسط","committee":"11","seat":"3245509066","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"ريان ابراهيم علي الفلاحى","id":"1157877273","class":"الثالث المتوسط","committee":"11","seat":"3245509067","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"ريان سمير ابو الغيث يغنم","id":"160232255","class":"الثالث المتوسط","committee":"11","seat":"3245509068","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"ريان عبدالرحيم عبد الله سليمان","id":"2417541535","class":"الثالث المتوسط","committee":"11","seat":"3245509069","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"ريان هاشم محمد باموسي","id":"1156913251","class":"الثالث المتوسط","committee":"11","seat":"3245509070","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"زبير حبيب الرحمن حافظ محمد مظهر الحق","id":"2363542651","class":"الثالث المتوسط","committee":"11","seat":"3245509071","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"زياد علي محمد كعبي","id":"1154835407","class":"الثالث المتوسط","committee":"11","seat":"3245509072","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"زياد مجدي بن احمد اليماني","id":"1154645855","class":"الثالث المتوسط","committee":"11","seat":"3245509073","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"زياد محمد ناصر القحطاني","id":"1157774462","class":"الثالث المتوسط","committee":"11","seat":"3245509074","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سالم علوان ذيبان القرني","id":"1156662924","class":"الثالث المتوسط","committee":"11","seat":"3245509075","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سامر حسين جوهر صالح اسكندر","id":"2298170206","class":"الثالث المتوسط","committee":"11","seat":"3245509076","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سامر علي جبران معشي","id":"1153406614","class":"الثالث المتوسط","committee":"11","seat":"3245509077","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سعود فيصل بن عبدالله احمد","id":"1152684377","class":"الثالث المتوسط","committee":"11","seat":"3245509078","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سلطان عبدالله سالم الزهراني","id":"1153549728","class":"الثالث المتوسط","committee":"11","seat":"3245509079","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سلمان عقيل زين الزبيدي","id":"1157395581","class":"الثالث المتوسط","committee":"11","seat":"3245509080","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سلمان ناصر سعد الشمراني","id":"1149687251","class":"الثالث المتوسط","committee":"11","seat":"3245509081","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سليمان حسن محمد صغير","id":"1159128410","class":"الثالث المتوسط","committee":"11","seat":"3245509082","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سند عبدالله هاشم البركاتي","id":"1157538552","class":"الثالث المتوسط","committee":"11","seat":"3245509083","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سهيل ابوالعالم قاسم مياه","id":"2544558555","class":"الثالث المتوسط","committee":"11","seat":"3245509084","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سهيل علي بوتو صالح لقمان حكيم","id":"2364309415","class":"الثالث المتوسط","committee":"11","seat":"3245509085","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سيف سميح سعيد السلمي","id":"1155873860","class":"الثالث المتوسط","committee":"11","seat":"3245509086","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"سيف يحى بن احمد شراحيلي","id":"1158724425","class":"الثالث المتوسط","committee":"11","seat":"3245509087","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"شاهد سليم الله وصي الرحمن قاسم علي","id":"2412405033","class":"الثالث المتوسط","committee":"11","seat":"3245509088","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"شعيب عبدالرحيم احمد - خليل الرحمن","id":"2284058365","class":"الثالث المتوسط","committee":"11","seat":"3245509089","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"صالح أبوطالب يحى الحسني","id":"1156554790","class":"الثالث المتوسط","committee":"11","seat":"3245509090","classroom":"(2م3)","building":"البنى الأوسط"},{"name":"صالح احمد بن محمد الزهراني","id":"1160223481","class":"الثالث المتوسط","committee":"12","seat":"3245509091","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"صالح عبدالله صالح العماري","id":"1158370047","class":"الثالث المتوسط","committee":"12","seat":"3245509092","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عابد محمد يونس عبدالسبحان أوثاد","id":"2317312169","class":"الثالث المتوسط","committee":"12","seat":"3245509093","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عامر حيدر عامر الناشري","id":"1130506874","class":"الثالث المتوسط","committee":"12","seat":"3245509094","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبد اللة عمر فاروق عبدالامين","id":"2409789878","class":"الثالث المتوسط","committee":"12","seat":"3245509095","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبد الله محمد عيسى خان","id":"2274244330","class":"الثالث المتوسط","committee":"12","seat":"3245509096","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن علي علي سالم","id":"2320056902","class":"الثالث المتوسط","committee":"12","seat":"3245509097","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن محمد شامي عسيري","id":"1163140138","class":"الثالث المتوسط","committee":"12","seat":"3245509098","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن محمد عبدالرحمن بهكلي","id":"1157840453","class":"الثالث المتوسط","committee":"12","seat":"3245509099","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن منصور عبدالله الاحمري","id":"1158329555","class":"الثالث المتوسط","committee":"12","seat":"3245509100","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن يحى علي الكناني","id":"1157701119","class":"الثالث المتوسط","committee":"12","seat":"3245509101","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحمن يونس شوكت علي","id":"2261521922","class":"الثالث المتوسط","committee":"12","seat":"3245509102","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالرحيم سعيد علي الزهراني","id":"1154267601","class":"الثالث المتوسط","committee":"12","seat":"3245509103","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالعزيز زاهدعالم - عبدالعزيز","id":"2408234298","class":"الثالث المتوسط","committee":"12","seat":"3245509104","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالعزيز ظافر مقبول حكمي","id":"1163341355","class":"الثالث المتوسط","committee":"12","seat":"3245509105","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالعزيز لافي طليمس البجالي","id":"1158247245","class":"الثالث المتوسط","committee":"12","seat":"3245509106","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالعزيز موسى علي عبدلي","id":"1168317426","class":"الثالث المتوسط","committee":"12","seat":"3245509107","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله بندر بن احمد الشمراني","id":"1152987564","class":"الثالث المتوسط","committee":"12","seat":"3245509108","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله سامي اسماعيل حظاء","id":"1152609119","class":"الثالث المتوسط","committee":"12","seat":"3245509109","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله سليمان عبدالله بن سلمان","id":"1158372597","class":"الثالث المتوسط","committee":"12","seat":"3245509110","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله طلال احمد سرور","id":"1156510925","class":"الثالث المتوسط","committee":"12","seat":"3245509111","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله طلال محمد آل احمد","id":"1158007839","class":"الثالث المتوسط","committee":"12","seat":"3245509112","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله عبدالعزيز سعيد العمودي","id":"1154335481","class":"الثالث المتوسط","committee":"12","seat":"3245509113","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله عبدالناصر بن علي الزهراني","id":"1160297287","class":"الثالث المتوسط","committee":"12","seat":"3245509114","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله عدنان محمد بهلول","id":"2317931505","class":"الثالث المتوسط","committee":"12","seat":"3245509115","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله علي عيد الثقفي","id":"1154226185","class":"الثالث المتوسط","committee":"12","seat":"3245509116","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله عمر بن عبده الصائغ","id":"1147755035","class":"الثالث المتوسط","committee":"12","seat":"3245509117","classroom":"(2م2)","building":"البنى الأوسط"},{"name":"عبدالله فيصل عبدالله الجدعاني","id":"1157317726","class":"الثالث المتوسط","committee":"13","seat":"3245509118","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالله محمد بن عبدالله الاسمري","id":"1157005909","class":"الثالث المتوسط","committee":"13","seat":"3245509119","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالله محمد حسن سلامي","id":"1155142548","class":"الثالث المتوسط","committee":"13","seat":"3245509120","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالله محمد علي كعبي","id":"1153561020","class":"الثالث المتوسط","committee":"13","seat":"3245509121","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالله مرعي بن عبدالله القرني","id":"1161756703","class":"الثالث المتوسط","committee":"13","seat":"3245509122","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالله مصلح خضران القرني","id":"1155209636","class":"الثالث المتوسط","committee":"13","seat":"3245509123","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالمجيد ابراهيم احمد الزهراني","id":"1156774794","class":"الثالث المتوسط","committee":"13","seat":"3245509124","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالمجيد عبدالله عبدالرحمن الاسمري","id":"1156381632","class":"الثالث المتوسط","committee":"13","seat":"3245509125","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عبدالمجيد محمد بن فتح الدين عسيري","id":"1160306500","class":"الثالث المتوسط","committee":"13","seat":"3245509126","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عزام انعام الله نور عالم عبدالمجيد","id":"2367202005","class":"الثالث المتوسط","committee":"13","seat":"3245509127","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عزام نورالاسلام رشيد احمد امين احمد","id":"2305041606","class":"الثالث المتوسط","committee":"13","seat":"3245509128","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عصام احمد علي الجزاز","id":"2390111322","class":"الثالث المتوسط","committee":"13","seat":"3245509129","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عصام عبدالله علي حمدي","id":"1154879876","class":"الثالث المتوسط","committee":"13","seat":"3245509130","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي ابراهيم علي الشهري","id":"1158245959","class":"الثالث المتوسط","committee":"13","seat":"3245509131","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي احمد علي المالكي","id":"1157022805","class":"الثالث المتوسط","committee":"13","seat":"3245509132","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي احمد علي حمدان القرني","id":"1158179950","class":"الثالث المتوسط","committee":"13","seat":"3245509133","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي حميدان بن احمد الزهراني","id":"1153461742","class":"الثالث المتوسط","committee":"13","seat":"3245509134","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي زهير ابن علي الشهري","id":"1153862717","class":"الثالث المتوسط","committee":"13","seat":"3245509135","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي صغير علي الشهري","id":"1152143804","class":"الثالث المتوسط","committee":"13","seat":"3245509136","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"علي يونس محمد اسماعيل","id":"2113275594","class":"الثالث المتوسط","committee":"13","seat":"3245509137","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عماد سامي جودالله السلمي","id":"1159161999","class":"الثالث المتوسط","committee":"13","seat":"3245509138","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عماد عبدالسلام علي عبدالله","id":"161074467","class":"الثالث المتوسط","committee":"13","seat":"3245509139","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عماد عبدالله بن علي الزبيدي","id":"1154958266","class":"الثالث المتوسط","committee":"13","seat":"3245509140","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عماد محمد ايوب - فضل حكيم","id":"2435706169","class":"الثالث المتوسط","committee":"13","seat":"3245509141","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عمار عظيم الله مولانا محمد امير حمزه","id":"2409164213","class":"الثالث المتوسط","committee":"13","seat":"3245509142","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عمر علي عمر المصلحي","id":"1155319708","class":"الثالث المتوسط","committee":"13","seat":"3245509143","classroom":"(2م4)","building":"البنى الأوسط"},{"name":"عمر محمدرفيق محمد الله عبدالقادر","id":"2412528065","class":"الثالث المتوسط","committee":"13","seat":"3245509144","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"غسان عطيه بن هلال الغامدي","id":"1156092148","class":"الثالث المتوسط","committee":"14","seat":"3245509145","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فارس حوشان احمد الشهري","id":"12544555","class":"الثالث المتوسط","committee":"14","seat":"3245509146","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فارس عبد الله بني امين عبد الغفور","id":"2422798781","class":"الثالث المتوسط","committee":"14","seat":"3245509147","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فارس محمد ايوب - فضل حكيم","id":"2427561622","class":"الثالث المتوسط","committee":"14","seat":"3245509148","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فهد ادريس فضل سيدفضل","id":"2426622706","class":"الثالث المتوسط","committee":"14","seat":"3245509149","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فهد شارع بن سعد السبيعي","id":"1149643163","class":"الثالث المتوسط","committee":"14","seat":"3245509150","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فهد مبارك محمد مقبل","id":"1157209600","class":"الثالث المتوسط","committee":"14","seat":"3245509151","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فهد محمد بن سلمان مجرشي","id":"1155758442","class":"الثالث المتوسط","committee":"14","seat":"3245509152","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فهد محمد دغشر حدادي","id":"1153749070","class":"الثالث المتوسط","committee":"14","seat":"3245509153","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فيصل غانم سارح الشراري","id":"1155964578","class":"الثالث المتوسط","committee":"14","seat":"3245509154","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"فيصل محمد سعد الغامدي","id":"1174986156","class":"الثالث المتوسط","committee":"14","seat":"3245509155","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"قاسم عيسى قاسم خشوري","id":"1159005394","class":"الثالث المتوسط","committee":"14","seat":"3245509156","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"لؤي عادل خديش مقري","id":"1155441692","class":"الثالث المتوسط","committee":"14","seat":"3245509157","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"لؤي محمد عبدالله الحامدي","id":"4184202358","class":"الثالث المتوسط","committee":"14","seat":"3245509158","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"ماجد محرم شوعي محمد","id":"1163358847","class":"الثالث المتوسط","committee":"14","seat":"3245509159","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد بشير ابراهيم بشير","id":"1158283638","class":"الثالث المتوسط","committee":"14","seat":"3245509160","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد بندر محمد الصامطي","id":"1158708048","class":"الثالث المتوسط","committee":"14","seat":"3245509161","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد حسن محمد الزبيدي","id":"1155884172","class":"الثالث المتوسط","committee":"14","seat":"3245509162","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد خالد الضو ادريس","id":"2418370447","class":"الثالث المتوسط","committee":"14","seat":"3245509163","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد سالم محمد الشهري","id":"1153640824","class":"الثالث المتوسط","committee":"14","seat":"3245509164","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد صالح عمر المنهالي","id":"1154762411","class":"الثالث المتوسط","committee":"14","seat":"3245509165","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عبدالرحمن بن عياد المولد","id":"1170697146","class":"الثالث المتوسط","committee":"14","seat":"3245509166","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عبدالرحمن حبيب الرحمن باسا مياه","id":"2308183777","class":"الثالث المتوسط","committee":"14","seat":"3245509167","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عبدالرحمن محمد البارقي","id":"1155701715","class":"الثالث المتوسط","committee":"14","seat":"3245509168","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عبدالله محمد احمد","id":"2379331446","class":"الثالث المتوسط","committee":"14","seat":"3245509169","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عبدالله محمد هزازي","id":"1156446716","class":"الثالث المتوسط","committee":"14","seat":"3245509170","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عثمان ابراهيم الشيخي","id":"1153517725","class":"الثالث المتوسط","committee":"14","seat":"3245509171","classroom":"(2م5)","building":"البنى الأوسط"},{"name":"محمد عزيزالحق - سليمان","id":"2414227328","class":"الثالث المتوسط","committee":"15","seat":"3245509172","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد عصام محمد الشهري","id":"1154892663","class":"الثالث المتوسط","committee":"15","seat":"3245509173","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد علي بن محمد الزهراني","id":"1153091796","class":"الثالث المتوسط","committee":"15","seat":"3245509174","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد علي محمد القرني","id":"1154536237","class":"الثالث المتوسط","committee":"15","seat":"3245509175","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد علي محمد صغير","id":"2298526142","class":"الثالث المتوسط","committee":"15","seat":"3245509176","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد علي محمد عسيري","id":"1160849020","class":"الثالث المتوسط","committee":"15","seat":"3245509177","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد مجدي محمد نجيب","id":"M05813229","class":"الثالث المتوسط","committee":"15","seat":"3245509178","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد محمداياز محمد ايوب عبدالرشيد","id":"2402793141","class":"الثالث المتوسط","committee":"15","seat":"3245509179","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد مسفر محمد السهيمي","id":"1154939928","class":"الثالث المتوسط","committee":"15","seat":"3245509180","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمد يزيد محمد هميلي","id":"1156166520","class":"الثالث المتوسط","committee":"15","seat":"3245509181","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"محمود محمدرفيق محمد الله عبدالقادر","id":"2412527752","class":"الثالث المتوسط","committee":"15","seat":"3245509182","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مراد احمد دخيل الله السبعى","id":"1154315350","class":"الثالث المتوسط","committee":"15","seat":"3245509183","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مشاري حامد معيض الحارثي","id":"1154997728","class":"الثالث المتوسط","committee":"15","seat":"3245509184","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مشاري فيصل محمد المولد","id":"1156166553","class":"الثالث المتوسط","committee":"15","seat":"3245509185","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مشعل عبدالله سعيد الاسمري","id":"1157625003","class":"الثالث المتوسط","committee":"15","seat":"3245509186","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مصطفى محمد أصغر فقير محمد","id":"2359377146","class":"الثالث المتوسط","committee":"15","seat":"3245509187","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"معاذ سليم الله عبدالرحمن عزيز","id":"tjza$14275544","class":"الثالث المتوسط","committee":"15","seat":"3245509188","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"معاذ عيد بن عطيه البركاتى","id":"1152566103","class":"الثالث المتوسط","committee":"15","seat":"3245509189","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"معتز خالد مشعل الازوري","id":"1158777233","class":"الثالث المتوسط","committee":"15","seat":"3245509190","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"معيض صالح عطيه القرني","id":"1154552507","class":"الثالث المتوسط","committee":"15","seat":"3245509191","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"منصور محمد ناصر السبيعي","id":"1207393123","class":"الثالث المتوسط","committee":"15","seat":"3245509192","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مهنا يحى محمد القرني","id":"1160978654","class":"الثالث المتوسط","committee":"15","seat":"3245509193","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"مهند خلف ذاكر الحربي","id":"1158694891","class":"الثالث المتوسط","committee":"15","seat":"3245509194","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"نادر علي محسن القرني","id":"1155524687","class":"الثالث المتوسط","committee":"15","seat":"3245509195","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"ناصر عبدالله بن عساف الكثيري","id":"1159095882","class":"الثالث المتوسط","committee":"15","seat":"3245509196","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"ناصر عطيه فرج بن عطيه","id":"1158606689","class":"الثالث المتوسط","committee":"15","seat":"3245509197","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"نمير مرعي حسين ابراهيم","id":"1184342028","class":"الثالث المتوسط","committee":"15","seat":"3245509198","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"نواف ماجد عبدالله البيشي","id":"1158262723","class":"الثالث المتوسط","committee":"16","seat":"3245509199","classroom":"خاصة ١","building":"البنى الأوسط"},{"name":"هادي يحيى محمد معشي","id":"1156139105","class":"الثالث المتوسط","committee":"16","seat":"3245509200","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هاشم احمد بن عبدالله العقيلي","id":"1155970914","class":"الثالث المتوسط","committee":"16","seat":"3245509201","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هاني حسن محمد الحارثي","id":"1155935164","class":"الثالث المتوسط","committee":"16","seat":"3245509202","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هتان بندر بن جبر العتيبي","id":"1156751461","class":"الثالث المتوسط","committee":"16","seat":"3245509203","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هزاع حمد سعيد الجدعاني","id":"1157928944","class":"الثالث المتوسط","committee":"16","seat":"3245509204","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هزاع سياف محمد القحطاني","id":"1155143504","class":"الثالث المتوسط","committee":"16","seat":"3245509205","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هشام ماجد عتيق الله السلمى","id":"1159908670","class":"الثالث المتوسط","committee":"16","seat":"3245509206","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"هيثم عبدالرحمن سالم الشهري","id":"1154466377","class":"الثالث المتوسط","committee":"16","seat":"3245509207","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وائل خلوي محمد حمزه","id":"1158818821","class":"الثالث المتوسط","committee":"16","seat":"3245509208","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وسام احمد بن حمدان الحربي","id":"1157426402","class":"الثالث المتوسط","committee":"16","seat":"3245509209","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وسام حمدان حامد المالكي","id":"1155375031","class":"الثالث المتوسط","committee":"16","seat":"3245509210","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وسام عماد احمد الزهراني","id":"1156444687","class":"الثالث المتوسط","committee":"16","seat":"3245509211","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وسيم جابر علي علواني","id":"1205984063","class":"الثالث المتوسط","committee":"16","seat":"3245509212","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"وسيم سمير حسن الزهراني","id":"1158023539","class":"الثالث المتوسط","committee":"16","seat":"3245509213","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"ياسر علي صالح العمري","id":"1154514176","class":"الثالث المتوسط","committee":"16","seat":"3245509214","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"ياسر فؤاد بن محمد محتر","id":"1156097584","class":"الثالث المتوسط","committee":"16","seat":"3245509215","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يامن عبدالرحمن محمد العارف","id":"2310408097","class":"الثالث المتوسط","committee":"16","seat":"3245509216","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يحيى ماجد حسن ضعاني","id":"1157476795","class":"الثالث المتوسط","committee":"16","seat":"3245509217","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يوسف مشرف احمد الزهراني","id":"1154490161","class":"الثالث المتوسط","committee":"16","seat":"3245509218","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يونس محسن الجبري قاسم","id":"2298015021","class":"الثالث المتوسط","committee":"16","seat":"3245509219","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يونس محمد لقمان حكيم محمد صديق","id":"2326264658","class":"الثالث المتوسط","committee":"16","seat":"3245509220","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"يونس محمود ابن محمد العيسي","id":"1150026886","class":"الثالث المتوسط","committee":"16","seat":"3245509221","classroom":"خاصة ٢","building":"البنى الأوسط"},{"name":"عبدالعزيز بن زكي بن عبدالعزيز آل شل القرني","id":"1166410538","class":"الأول المتوسط","committee":"17","seat":"3245507165","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله احمد عبدالله الزهراني","id":"1165687821","class":"الأول المتوسط","committee":"17","seat":"3245507166","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله حامد احمد الشمراني","id":"1164240374","class":"الأول المتوسط","committee":"17","seat":"3245507167","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله حسن علي الاسمري","id":"1166919686","class":"الأول المتوسط","committee":"17","seat":"3245507168","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله سعد عبدالله القرني","id":"1163632266","class":"الأول المتوسط","committee":"17","seat":"3245507169","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله سعييد عبدالله القرني","id":"1164361485","class":"الأول المتوسط","committee":"17","seat":"3245507170","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله عبيد احمد الجبرتي","id":"1191075546","class":"الأول المتوسط","committee":"17","seat":"3245507171","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله عبيد عبدالله الحربي","id":"1163544818","class":"الأول المتوسط","committee":"17","seat":"3245507172","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله عثمان عبدالله العرياني","id":"1163805003","class":"الأول المتوسط","committee":"17","seat":"3245507173","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله عواض حسن الشهري","id":"1163608100","class":"الأول المتوسط","committee":"17","seat":"3245507174","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله عيد علي الشمراني","id":"1165460583","class":"الأول المتوسط","committee":"17","seat":"3245507175","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله لفاح سالم السويداء","id":"1167609864","class":"الأول المتوسط","committee":"17","seat":"3245507176","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد احمد مجرشي","id":"1162301665","class":"الأول المتوسط","committee":"17","seat":"3245507177","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد بن سعد العفاري","id":"1154344632","class":"الأول المتوسط","committee":"17","seat":"3245507178","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد بن مطر السهيمي","id":"1166902534","class":"الأول المتوسط","committee":"17","seat":"3245507179","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد جمعان الزهراني","id":"1163874918","class":"الأول المتوسط","committee":"17","seat":"3245507180","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد سعيد الغامدي","id":"1164479188","class":"الأول المتوسط","committee":"17","seat":"3245507181","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي جابر علي العيسي","id":"1163038001","class":"الثاني المتوسط","committee":"17","seat":"3245508152","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي خالد صديق صديق","id":"1158767556","class":"الثاني المتوسط","committee":"17","seat":"3245508153","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي عبدالرحمن علي القرني","id":"1161393911","class":"الثاني المتوسط","committee":"17","seat":"3245508154","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي غازي علي الجيزاني","id":"1177446844","class":"الثاني المتوسط","committee":"17","seat":"3245508155","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي محسن بن سالم المنهالي","id":"1155019761","class":"الثاني المتوسط","committee":"17","seat":"3245508156","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"علي محمد بن جمعان الزهراني","id":"1157132919","class":"الثاني المتوسط","committee":"17","seat":"3245508157","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عماد مشعل علي الغامدي","id":"1168522074","class":"الثاني المتوسط","committee":"17","seat":"3245508158","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عمار حسن يحي سلامي","id":"1161118482","class":"الثاني المتوسط","committee":"17","seat":"3245508159","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عمار عبدالله محمد هزازي","id":"1159850385","class":"الثاني المتوسط","committee":"17","seat":"3245508160","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عمار ياسر عبدالله المعشي","id":"1158436764","class":"الثاني المتوسط","committee":"17","seat":"3245508161","classroom":"(3م1)","building":"المبنى الجنوبي"},{"name":"عبدالله محمد عبدالله الشهري","id":"1165139609","class":"الأول المتوسط","committee":"18","seat":"3245507182","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالله مصطفى جابر الصبياني","id":"1165192491","class":"الأول المتوسط","committee":"18","seat":"3245507183","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالله موسى عبدالله العيسي","id":"1166597177","class":"الأول المتوسط","committee":"18","seat":"3245507184","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالله نزار عبدالله بامعبد","id":"1167416328","class":"الأول المتوسط","committee":"18","seat":"3245507185","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالمجيد عثمان بن محمد ال القنوي","id":"1165715788","class":"الأول المتوسط","committee":"18","seat":"3245507186","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالمجيد محمد احمد الحربي","id":"1165914548","class":"الأول المتوسط","committee":"18","seat":"3245507187","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالمجيد ناصر بن سعدالله الزهراني","id":"1162891467","class":"الأول المتوسط","committee":"18","seat":"3245507188","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالملك مجدي سعيد محتسب","id":"1167058658","class":"الأول المتوسط","committee":"18","seat":"3245507189","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبدالواحد دماس غرامه فقيه","id":"1167718699","class":"الأول المتوسط","committee":"18","seat":"3245507190","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عبيد حامد بن عبيد السهيمي","id":"1165081587","class":"الأول المتوسط","committee":"18","seat":"3245507191","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عز محمد صالح العماري","id":"1166511756","class":"الأول المتوسط","committee":"18","seat":"3245507192","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عصام احمد علي حوباني","id":"1166307882","class":"الأول المتوسط","committee":"18","seat":"3245507193","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عصام سعد محمد الزهراني","id":"1165978592","class":"الأول المتوسط","committee":"18","seat":"3245507194","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"علي حسن علي المولد","id":"1166798767","class":"الأول المتوسط","committee":"18","seat":"3245507195","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"علي خضر عبدالله الشهري","id":"1163478330","class":"الأول المتوسط","committee":"18","seat":"3245507196","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"علي سامي حسن الشهري","id":"1164141960","class":"الأول المتوسط","committee":"18","seat":"3245507197","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"علي صالح علي الزهراني","id":"1164261586","class":"الأول المتوسط","committee":"18","seat":"3245507198","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عمر امير عبدالقادر صباغ","id":"2320828698","class":"الثاني المتوسط","committee":"18","seat":"3245508162","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عمر عبدالرحمن بريك الشمراني","id":"1165441260","class":"الثاني المتوسط","committee":"18","seat":"3245508163","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عمر عبدالله قشاش العرياني","id":"1161536220","class":"الثاني المتوسط","committee":"18","seat":"3245508164","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عمران عائش احمد الصبياني","id":"1157215797","class":"الثاني المتوسط","committee":"18","seat":"3245508165","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"عوض ابراهيم عوض الشمراني","id":"1160541387","class":"الثاني المتوسط","committee":"18","seat":"3245508166","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"غازي عبدالرحمن احمد كلفوت","id":"1164009076","class":"الثاني المتوسط","committee":"18","seat":"3245508167","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"فراس عبدالله علي شبيلي","id":"1160281588","class":"الثاني المتوسط","committee":"18","seat":"3245508168","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"فراس مصطفى صالح الزهراني","id":"1160412746","class":"الثاني المتوسط","committee":"18","seat":"3245508169","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"فهد راشد بن خلوي الحايطي","id":"1162612798","class":"الثاني المتوسط","committee":"18","seat":"3245508170","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"فهد محمد علي كعبي","id":"1151612965","class":"الثاني المتوسط","committee":"18","seat":"3245508171","classroom":"(3م2)","building":"المبنى الجنوبي"},{"name":"علي عبدالرحمن حنش بارقي","id":"1168138574","class":"الأول المتوسط","committee":"19","seat":"3245507199","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"علي محمد علي الشهري","id":"1165462712","class":"الأول المتوسط","committee":"19","seat":"3245507200","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عماد محمد بن حسن العبدلي","id":"1164517805","class":"الأول المتوسط","committee":"19","seat":"3245507201","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر سعد علي ال شعثان","id":"1166181816","class":"الأول المتوسط","committee":"19","seat":"3245507202","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر صالح بن أحمد السني","id":"1166892321","class":"الأول المتوسط","committee":"19","seat":"3245507203","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر علي سعيد القرني","id":"1166041101","class":"الأول المتوسط","committee":"19","seat":"3245507204","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر فهد علي الزهراني","id":"1188838070","class":"الأول المتوسط","committee":"19","seat":"3245507205","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر متعب عمر الشهري","id":"1162933038","class":"الأول المتوسط","committee":"19","seat":"3245507206","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عمر محمد عمر داود","id":"1020301023","class":"الأول المتوسط","committee":"19","seat":"3245507207","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عوض خالد عوض العمري","id":"1163740747","class":"الأول المتوسط","committee":"19","seat":"3245507208","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عيسى مسكن فالح اليزيدي","id":"1164670703","class":"الأول المتوسط","committee":"19","seat":"3245507209","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"عيسى ناصر سعد الشمراني","id":"1163191396","class":"الأول المتوسط","committee":"19","seat":"3245507210","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"غسان عبدالله صالح الزهراني","id":"1167339975","class":"الأول المتوسط","committee":"19","seat":"3245507211","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فارس احمد علوي عبدالواحد","id":"1166727774","class":"الأول المتوسط","committee":"19","seat":"3245507212","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فارس صالح عبدالله الزهراني","id":"1163969304","class":"الأول المتوسط","committee":"19","seat":"3245507213","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فارس عبدالله فضل العمري","id":"1165183029","class":"الأول المتوسط","committee":"19","seat":"3245507214","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فارس علي دخيل العرياني","id":"1166389161","class":"الأول المتوسط","committee":"19","seat":"3245507215","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فيصل احمد حسين حيدرة","id":"10786719","class":"الثاني المتوسط","committee":"19","seat":"3245508172","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فيصل عبدالله مسعود الرشيدي","id":"1156861153","class":"الثاني المتوسط","committee":"19","seat":"3245508173","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فيصل محمد عبيد الحربي","id":"1162475279","class":"الثاني المتوسط","committee":"19","seat":"3245508174","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"قصي ابوزيد جابر الزهراني","id":"1162405797","class":"الثاني المتوسط","committee":"19","seat":"3245508175","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"لؤي محمد زايد الزهراني","id":"1171201344","class":"الثاني المتوسط","committee":"19","seat":"3245508176","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"ليث سالم عائض الصيعري","id":"1160167373","class":"الثاني المتوسط","committee":"19","seat":"3245508177","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"مؤيد عجي علي هزازي","id":"1158575124","class":"الثاني المتوسط","committee":"19","seat":"3245508178","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"مؤيد محمد صالح علي الجعدي","id":"6073456823","class":"الثاني المتوسط","committee":"19","seat":"3245508179","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"مؤيد هزاع علي الشمراني","id":"1158950582","class":"الثاني المتوسط","committee":"19","seat":"3245508180","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"مازن محمد بن معيض الأسمري","id":"1163225475","class":"الثاني المتوسط","committee":"19","seat":"3245508181","classroom":"(3م3)","building":"المبنى الجنوبي"},{"name":"فراس خالد علي عواجي","id":"1166752400","class":"الأول المتوسط","committee":"20","seat":"3245507216","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فزاع احمد عواض العتيبي","id":"1160611933","class":"الأول المتوسط","committee":"20","seat":"3245507217","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فضل مطر مطر خان","id":"1189531666","class":"الأول المتوسط","committee":"20","seat":"3245507218","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد بندر محمد الصامطي","id":"1166439321","class":"الأول المتوسط","committee":"20","seat":"3245507219","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد تركي فهد الزهراني","id":"1165235597","class":"الأول المتوسط","committee":"20","seat":"3245507220","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد سعد حميد العبسي","id":"1166515096","class":"الأول المتوسط","committee":"20","seat":"3245507221","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد عبدالله عطيه الثقفي","id":"1168290821","class":"الأول المتوسط","committee":"20","seat":"3245507222","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد علي عبدربه المصعبي","id":"1164479063","class":"الأول المتوسط","committee":"20","seat":"3245507223","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد محمد سعيد الغامدي","id":"1174985943","class":"الأول المتوسط","committee":"20","seat":"3245507224","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فهد نشمي مسعد العتيبي","id":"1164448464","class":"الأول المتوسط","committee":"20","seat":"3245507225","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل احمد عواض العتيبي","id":"1166269280","class":"الأول المتوسط","committee":"20","seat":"3245507226","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل تركي زاهر الجوفي","id":"1185997028","class":"الأول المتوسط","committee":"20","seat":"3245507227","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل سعيد غرم الله الدماك","id":"1164635326","class":"الأول المتوسط","committee":"20","seat":"3245507228","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل عيسي عصابي الهياشي","id":"1164872663","class":"الأول المتوسط","committee":"20","seat":"3245507229","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل فهد احمد ابوصوله","id":"1166984516","class":"الأول المتوسط","committee":"20","seat":"3245507230","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل فهد عالي المالكي","id":"1164511014","class":"الأول المتوسط","committee":"20","seat":"3245507231","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل محمد جوهر الشهري","id":"1166344000","class":"الأول المتوسط","committee":"20","seat":"3245507232","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"ماهر محمد حسين الكبيشي","id":"1163938317","class":"الثاني المتوسط","committee":"20","seat":"3245508182","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"متعب جعفر مرعي الزهراني","id":"1159956596","class":"الثاني المتوسط","committee":"20","seat":"3245508183","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد أحمد محمد الحارثي","id":"1161177777","class":"الثاني المتوسط","committee":"20","seat":"3245508184","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد احمد ابكر صالح","id":"2331300455","class":"الثاني المتوسط","committee":"20","seat":"3245508185","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد احمد بن عبدالواحد الزهراني","id":"1161807357","class":"الثاني المتوسط","committee":"20","seat":"3245508186","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد احمد مكي المجمدي","id":"1195431240","class":"الثاني المتوسط","committee":"20","seat":"3245508187","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد بندر محمد الشهري","id":"1161370398","class":"الثاني المتوسط","committee":"20","seat":"3245508188","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد حسن ابن محمد الزبيدي","id":"1158469294","class":"الثاني المتوسط","committee":"20","seat":"3245508189","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد حمزه محمد الزبيدي","id":"1160377774","class":"الثاني المتوسط","committee":"20","seat":"3245508190","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"محمد خالد جمعان الزهراني","id":"1159680774","class":"الثاني المتوسط","committee":"20","seat":"3245508191","classroom":"(3م4)","building":"المبنى الجنوبي"},{"name":"فيصل محمد يحي الزهراني","id":"1168749586","class":"الأول المتوسط","committee":"21","seat":"3245507233","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"كنان فهد حسين الزهراني","id":"1164678771","class":"الأول المتوسط","committee":"21","seat":"3245507234","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مؤيد حسن ظامري حامظي","id":"1163889882","class":"الأول المتوسط","committee":"21","seat":"3245507235","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مؤيد سعد محمد العسيري","id":"1163551318","class":"الأول المتوسط","committee":"21","seat":"3245507236","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مازن فؤاد محمد بلال","id":"1166362507","class":"الأول المتوسط","committee":"21","seat":"3245507237","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مالك فارس صهيب الريحاني","id":"1161884521","class":"الأول المتوسط","committee":"21","seat":"3245507238","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"متعب بندر نصار الخلوي","id":"1166626919","class":"الأول المتوسط","committee":"21","seat":"3245507239","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد ابوبكر ابن احمد الشدادي","id":"1164417212","class":"الأول المتوسط","committee":"21","seat":"3245507240","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد احمد فايز الصمداني","id":"1162955338","class":"الأول المتوسط","committee":"21","seat":"3245507241","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد احمد محمد الشمراني","id":"1162106445","class":"الأول المتوسط","committee":"21","seat":"3245507242","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد ادريس علي رقواني","id":"1163024217","class":"الأول المتوسط","committee":"21","seat":"3245507243","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد حامد محمد الصعب","id":"1166017630","class":"الأول المتوسط","committee":"21","seat":"3245507244","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد حمد محمد يوسف","id":"1165775451","class":"الأول المتوسط","committee":"21","seat":"3245507245","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد خلف سودان الزهراني","id":"1164748491","class":"الأول المتوسط","committee":"21","seat":"3245507246","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد رجب احمد الزهراني","id":"1164998971","class":"الأول المتوسط","committee":"21","seat":"3245507247","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد سليمان قاسم صديق افلاطون","id":"2548264569","class":"الأول المتوسط","committee":"21","seat":"3245507248","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد صالح بن محمد القرني","id":"1169724398","class":"الأول المتوسط","committee":"21","seat":"3245507249","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالعزيز محمد الغامدي","id":"1166993723","class":"الأول المتوسط","committee":"21","seat":"3245507250","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله حسين آل فازع","id":"1167334026","class":"الأول المتوسط","committee":"21","seat":"3245507251","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله محمد القحطاني","id":"1163544867","class":"الأول المتوسط","committee":"21","seat":"3245507252","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد علي ابراهيم قنش","id":"1164576702","class":"الأول المتوسط","committee":"21","seat":"3245507253","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد علي سالم الزهراني","id":"1167809225","class":"الأول المتوسط","committee":"21","seat":"3245507254","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد علي غرم الله الشمراني","id":"1160545271","class":"الأول المتوسط","committee":"21","seat":"3245507255","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد علي محمد عسيري","id":"1165157486","class":"الأول المتوسط","committee":"21","seat":"3245507256","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد فلاح احمد الزهرانى","id":"1166529147","class":"الأول المتوسط","committee":"21","seat":"3245507257","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد هزاع محمد مبارك","id":"1165365949","class":"الأول المتوسط","committee":"21","seat":"3245507258","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد يحي مبروك الاعجم","id":"1166252898","class":"الأول المتوسط","committee":"21","seat":"3245507259","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مراد علي درويش ابكر","id":"1166246676","class":"الأول المتوسط","committee":"21","seat":"3245507260","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد خالد محمد رشيدي","id":"1165312800","class":"الثاني المتوسط","committee":"21","seat":"3245508192","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد رشدان راشد العصيمي","id":"1160818967","class":"الثاني المتوسط","committee":"21","seat":"3245508193","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد سعود محمد صميلي","id":"1162467045","class":"الثاني المتوسط","committee":"21","seat":"3245508194","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد سلطان احمد الزهراني","id":"1161946064","class":"الثاني المتوسط","committee":"21","seat":"3245508195","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبد الله - عيسى","id":"2414290581","class":"الثاني المتوسط","committee":"21","seat":"3245508196","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالعليم يحي احمد","id":"4095950681","class":"الثاني المتوسط","committee":"21","seat":"3245508197","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله حمدي العتيبي","id":"1142487964","class":"الثاني المتوسط","committee":"21","seat":"3245508198","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله ربيع سليمان","id":"2333497432","class":"الثاني المتوسط","committee":"21","seat":"3245508199","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله علي الزهراني","id":"1158949360","class":"الثاني المتوسط","committee":"21","seat":"3245508200","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عبدالله موسى القرني","id":"1160448575","class":"الثاني المتوسط","committee":"21","seat":"3245508201","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد علي عطيه الغامدي","id":"1158996833","class":"الثاني المتوسط","committee":"21","seat":"3245508202","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد عماد محمد البسيسي","id":"1155932252","class":"الثاني المتوسط","committee":"21","seat":"3245508203","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد وليد محمد حسين","id":"4146769718","class":"الثاني المتوسط","committee":"21","seat":"3245508204","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمد يحي مهدي مجرشي","id":"1179627474","class":"الثاني المتوسط","committee":"21","seat":"3245508205","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"محمود على الاسعد الحسن","id":"2605338165","class":"الثاني المتوسط","committee":"21","seat":"3245508206","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مراد علي طلميس المنتشري","id":"1157548726","class":"الثاني المتوسط","committee":"21","seat":"3245508207","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مراد محمد علي المرادي","id":"41612121611","class":"الثاني المتوسط","committee":"21","seat":"3245508208","classroom":"(3م5)","building":"المبنى الجنوبي"},{"name":"مرعي محمد مرعي الحربي","id":"1166592483","class":"الأول المتوسط","committee":"22","seat":"3245507261","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مسفر علي مسفر الشمراني","id":"1187213358","class":"الأول المتوسط","committee":"22","seat":"3245507262","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مشاري عبدالله غرم الله الغامدي","id":"1165464718","class":"الأول المتوسط","committee":"22","seat":"3245507263","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مشعل اسماعيل علي الصبياني","id":"1170183964","class":"الأول المتوسط","committee":"22","seat":"3245507264","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مشعل ماجد بن عبدالله الزهراني","id":"1166119410","class":"الأول المتوسط","committee":"22","seat":"3245507265","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مصعب نايف علي الزهراني","id":"1164214239","class":"الأول المتوسط","committee":"22","seat":"3245507266","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ بركات حسن السيد","id":"1165902147","class":"الأول المتوسط","committee":"22","seat":"3245507267","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ عماد عبده الجيزاني","id":"1166027134","class":"الأول المتوسط","committee":"22","seat":"3245507268","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معن خالد عبده حمدي","id":"1162223240","class":"الأول المتوسط","committee":"22","seat":"3245507269","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مقرن محمد حسن القرني","id":"1163440280","class":"الأول المتوسط","committee":"22","seat":"3245507270","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"ممدوح مساعد عائض القرني","id":"1177118617","class":"الأول المتوسط","committee":"22","seat":"3245507271","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مهند سلطان بن جمعان الزهراني","id":"1165545847","class":"الأول المتوسط","committee":"22","seat":"3245507272","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مهند نبيل جابر الصبياني","id":"1166643393","class":"الأول المتوسط","committee":"22","seat":"3245507273","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"موسى سالم موسى القرني","id":"1166220176","class":"الأول المتوسط","committee":"22","seat":"3245507274","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مياف علي احمد الغانمي","id":"1165535285","class":"الأول المتوسط","committee":"22","seat":"3245507275","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نايف ناصر محمد احمد","id":"4863200236","class":"الأول المتوسط","committee":"22","seat":"3245507276","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نايف بن علي بن سعيد الزهراني","id":"1167896719","class":"الأول المتوسط","committee":"22","seat":"3245507277","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نمر حسين سعيد القحطاني","id":"1164605493","class":"الأول المتوسط","committee":"22","seat":"3245507278","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نواف سعيد صالح الغامدي","id":"1163672460","class":"الأول المتوسط","committee":"22","seat":"3245507279","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مشاري مبارك صغير الزبيدي","id":"1160373344","class":"الثاني المتوسط","committee":"22","seat":"3245508209","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ ابراهيم حسن عسيري","id":"1161611817","class":"الثاني المتوسط","committee":"22","seat":"3245508210","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ تركي علي الزهراني","id":"1161540081","class":"الثاني المتوسط","committee":"22","seat":"3245508211","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ حسين علي خلوي","id":"1161172505","class":"الثاني المتوسط","committee":"22","seat":"3245508212","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معاذ نبيل حمدان الزهراني","id":"1162430621","class":"الثاني المتوسط","committee":"22","seat":"3245508213","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معتز عبده بن حمود الماس","id":"1155799206","class":"الثاني المتوسط","committee":"22","seat":"3245508214","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معتز عصام عبدالله زرقان","id":"1164083022","class":"الثاني المتوسط","committee":"22","seat":"3245508215","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"معتز علي محمد مسرحي","id":"1159683034","class":"الثاني المتوسط","committee":"22","seat":"3245508216","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مناف علي ابراهيم الزهراني","id":"1161572092","class":"الثاني المتوسط","committee":"22","seat":"3245508217","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"منصور صالح عبده الشرعبي","id":"a06564760","class":"الثاني المتوسط","committee":"22","seat":"3245508218","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"منصور محمد عبدالمحسن ناصر","id":"1151135314","class":"الثاني المتوسط","committee":"22","seat":"3245508219","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"منصور محمد مسفر الزهراني","id":"1159064367","class":"الثاني المتوسط","committee":"22","seat":"3245508220","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مهند رافع بن محمد القرني","id":"1163296914","class":"الثاني المتوسط","committee":"22","seat":"3245508221","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"موسى على موسى عسيري","id":"1159518917","class":"الثاني المتوسط","committee":"22","seat":"3245508222","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"مياد جمعان محمود الزنبقي","id":"1161445588","class":"الثاني المتوسط","committee":"22","seat":"3245508223","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نواف عبدالله محمد جغدمي","id":"1162171423","class":"الثاني المتوسط","committee":"22","seat":"3245508224","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نواف مرزوق بن غالي المطيري","id":"1162826380","class":"الثاني المتوسط","committee":"22","seat":"3245508225","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نور حسن شريف نورالاسلام علي اكبر","id":"2402784389","class":"الثاني المتوسط","committee":"22","seat":"3245508226","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"نور رفيق الله نور حسين وسيع الرحمن","id":"2390322754","class":"الثاني المتوسط","committee":"22","seat":"3245508227","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هادي احمد هادي عسيري","id":"1153057755","class":"الثاني المتوسط","committee":"22","seat":"3245508228","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هاشم يحيى خضر الاحمدي","id":"1157120948","class":"الثاني المتوسط","committee":"22","seat":"3245508229","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هتان مشرف علي العبدلي","id":"1186845556","class":"الثاني المتوسط","committee":"22","seat":"3245508230","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هلال حمد هلال العسيري","id":"1161896749","class":"الثاني المتوسط","committee":"22","seat":"3245508231","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هيثم صالح بن عبدالله الزهراني","id":"1161875784","class":"الثاني المتوسط","committee":"22","seat":"3245508232","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هيثم صالح عبدالكريم عفيف","id":"160500827","class":"الثاني المتوسط","committee":"22","seat":"3245508233","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هيثم ياسر رجاء العتيبي","id":"1159577277","class":"الثاني المتوسط","committee":"22","seat":"3245508234","classroom":"(3م6)","building":"المبنى الجنوبي"},{"name":"هيثم عبدالرحمن هادي حدادي","id":"1167522331","class":"الأول المتوسط","committee":"23","seat":"3245507280","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وديع عبدالله مرزوق الصاعدي","id":"1162872079","class":"الأول المتوسط","committee":"23","seat":"3245507281","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسام خالد عبدالله الشهري","id":"1163612029","class":"الأول المتوسط","committee":"23","seat":"3245507282","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسام مبارك صغير الزبيدي","id":"1164690792","class":"الأول المتوسط","committee":"23","seat":"3245507283","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسام مرعي غرامه فقيه","id":"1166043545","class":"الأول المتوسط","committee":"23","seat":"3245507284","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسيم احمد يحى مطرى","id":"1163594730","class":"الأول المتوسط","committee":"23","seat":"3245507285","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وليد شعبان حمود الكثيري","id":"1165150242","class":"الأول المتوسط","committee":"23","seat":"3245507286","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسر ماجد بن خلف الطويرقي","id":"1163073271","class":"الأول المتوسط","committee":"23","seat":"3245507287","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يامن حسن يحي غزواني","id":"1161164429","class":"الأول المتوسط","committee":"23","seat":"3245507288","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يحيى محمد صالح الزهراني","id":"1163816182","class":"الأول المتوسط","committee":"23","seat":"3245507289","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن جبران محمد مخاي","id":"1167165420","class":"الأول المتوسط","committee":"23","seat":"3245507290","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن سراج عمر الحربي","id":"1164537514","class":"الأول المتوسط","committee":"23","seat":"3245507291","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد علي بن زاهر الزهراني","id":"1164092973","class":"الأول المتوسط","committee":"23","seat":"3245507292","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد ناصر محمد المالكي","id":"1162592537","class":"الأول المتوسط","committee":"23","seat":"3245507293","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف علي بن محمد المنتشري","id":"1166059616","class":"الأول المتوسط","committee":"23","seat":"3245507294","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف محمد احمد مزيبي","id":"1165972256","class":"الأول المتوسط","committee":"23","seat":"3245507295","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف محمد حسين الناشري","id":"1160351290","class":"الأول المتوسط","committee":"23","seat":"3245507296","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسام عبدالرحمن بن علي القرني","id":"1161897929","class":"الثاني المتوسط","committee":"23","seat":"3245508235","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وسيم ماجد احمد حسين","id":"2457111702","class":"الثاني المتوسط","committee":"23","seat":"3245508236","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وليد سعيد مرزوق اليزيدي","id":"1160365811","class":"الثاني المتوسط","committee":"23","seat":"3245508237","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وليد عبدالرحمن غرم الله الزهراني","id":"1162431769","class":"الثاني المتوسط","committee":"23","seat":"3245508238","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وليد فواز سعيد الحارثي","id":"1162390916","class":"الثاني المتوسط","committee":"23","seat":"3245508239","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"وليد معيض بن حسن العماري","id":"1162612780","class":"الثاني المتوسط","committee":"23","seat":"3245508240","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسر حمد علي السميري","id":"1159514023","class":"الثاني المتوسط","committee":"23","seat":"3245508241","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسر صغير علي الشهري","id":"1159568904","class":"الثاني المتوسط","committee":"23","seat":"3245508242","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسر علي ابن سعيد الزهراني","id":"1159738705","class":"الثاني المتوسط","committee":"23","seat":"3245508243","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسر محمد حنش العمري","id":"1160434245","class":"الثاني المتوسط","committee":"23","seat":"3245508244","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"ياسين بكر ايمان بركي","id":"2423787700","class":"الثاني المتوسط","committee":"23","seat":"3245508245","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يحى عبدالله محمد ال شعبي","id":"1161239460","class":"الثاني المتوسط","committee":"23","seat":"3245508246","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يحيى محمد يحيى البركاتي","id":"1161096324","class":"الثاني المتوسط","committee":"23","seat":"3245508247","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن خضر محمد العذيقي","id":"1159864642","class":"الثاني المتوسط","committee":"23","seat":"3245508248","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن محمد احمد الربعي","id":"1158732543","class":"الثاني المتوسط","committee":"23","seat":"3245508249","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن مسعود ضيف الله الزهراني","id":"1158784262","class":"الثاني المتوسط","committee":"23","seat":"3245508250","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزن مصلح محمد صبحي","id":"1153744501","class":"الثاني المتوسط","committee":"23","seat":"3245508251","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد حسين بن احمد العذيقي","id":"1158777019","class":"الثاني المتوسط","committee":"23","seat":"3245508252","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد عبدالله طوير العاصمي","id":"1162708547","class":"الثاني المتوسط","committee":"23","seat":"3245508253","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد قاسم سعيد الشمراني","id":"1156676239","class":"الثاني المتوسط","committee":"23","seat":"3245508254","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يزيد محمد احمد الربعي","id":"1158732501","class":"الثاني المتوسط","committee":"23","seat":"3245508255","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يمام بسام اسماعيل ابوحميد","id":"1163371311","class":"الثاني المتوسط","committee":"23","seat":"3245508256","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف حمد نافع الناشري","id":"1158474997","class":"الثاني المتوسط","committee":"23","seat":"3245508257","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف سلطان محمد عوام","id":"1162869844","class":"الثاني المتوسط","committee":"23","seat":"3245508258","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف طراد سعيد الحارثي","id":"1162314890","class":"الثاني المتوسط","committee":"23","seat":"3245508259","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف كمال بن ضيف الله الزهراني","id":"1165718188","class":"الثاني المتوسط","committee":"23","seat":"3245508260","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف محمد - المحمد","id":"2390604532","class":"الثاني المتوسط","committee":"23","seat":"3245508261","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف محمد منصور الحازمي","id":"1161140486","class":"الثاني المتوسط","committee":"23","seat":"3245508262","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يوسف ياسر محمد المصعبي","id":"96836547261","class":"الثاني المتوسط","committee":"23","seat":"3245508263","classroom":"(3م7)","building":"المبنى الجنوبي"},{"name":"يي بسام خالد عبدالرحمن المالكي","id":"1159883154","class":"الأول المتوسط","committee":"24","seat":"3245507297","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي حسن صالح بن حسن الزهراني","id":"1157129055","class":"الأول المتوسط","committee":"24","seat":"3245507298","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي عبدالله قائد عبدالله الشهراني","id":"1162923955","class":"الأول المتوسط","committee":"24","seat":"3245507299","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي وسام عوض بن شينان السهيمي","id":"1159133493","class":"الأول المتوسط","committee":"24","seat":"3245507300","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي يزن خالد حمزه برهومه","id":"1162266504","class":"الأول المتوسط","committee":"24","seat":"3245507301","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي أمجد مرزوق بن علي المحوري","id":"1162340788","class":"الثاني المتوسط","committee":"24","seat":"3245508264","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي عبد الرحمن توفيق علوان مقري","id":"1149869446","class":"الثاني المتوسط","committee":"24","seat":"3245508265","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي فيصل حاتم حامد الغامدي","id":"1157172261","class":"الثاني المتوسط","committee":"24","seat":"3245508266","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي محمد عمر محمد الحرازي","id":"1155964073","class":"الثاني المتوسط","committee":"24","seat":"3245508267","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي محمد فارس صالح الغامدي","id":"1156607895","class":"الثاني المتوسط","committee":"24","seat":"3245508268","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي وسيم احمد علي الرزقي","id":"1163695362","class":"الثاني المتوسط","committee":"24","seat":"3245508269","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي طلال عبدالله عبدالرحمن العصماني","id":"1144795455","class":"الثالث المتوسط","committee":"24","seat":"3245509222","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي عبدالله ماجد عبدالله الزهراني","id":"1154065237","class":"الثالث المتوسط","committee":"24","seat":"3245509223","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي عبدالمجيد عبدالله حامد الهلالي","id":"1132173590","class":"الثالث المتوسط","committee":"24","seat":"3245509224","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي فارس محمد مانع القحطاني","id":"1147982571","class":"الثالث المتوسط","committee":"24","seat":"3245509225","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي لؤي احمد علي الرزقي","id":"1154316812","class":"الثالث المتوسط","committee":"24","seat":"3245509226","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي مسفر حسن بن سعد القحطاني","id":"1156188151","class":"الثالث المتوسط","committee":"24","seat":"3245509227","classroom":"(2م7)","building":"المبنى الجنوبي"},{"name":"يي هتان عبيدالله جميل المحمادي","id":"1154848061","class":"الثالث المتوسط","committee":"24","seat":"3245509228","classroom":"(2م7)","building":"المبنى الجنوبي"}];
+
+// Convert Arabic-Indic and Extended Arabic-Indic digits → ASCII
+function toAsciiDigits(str) {
+  return str
+    .replace(/[\u0660-\u0669]/g, function(d) { return d.charCodeAt(0) - 0x0660; })
+    .replace(/[\u06F0-\u06F9]/g, function(d) { return d.charCodeAt(0) - 0x06F0; });
+}
+
+function normalise(str) {
+  if (!str) return '';
+  return str
+    .replace(/[\u064B-\u065F]/g, '')
+    .replace(/[\u0623\u0625\u0622\u0627]/g, '\u0627')
+    .replace(/\u0629/g, '\u0647')
+    .replace(/[\u064A\u0649]/g, '\u064A')
+    .toLowerCase()
+    .trim();
+}
+
+const INDEX = STUDENTS.map((s, i) => ({
+  raw: s,
+  idx: i,
+  name_norm: normalise(s.name),
+  id_clean: toAsciiDigits(s.id).replace(/[^\d]/g, ''),
+}));
+
+let currentResults = [];
+
+const searchInput = document.getElementById('searchInput');
+const clearBtn    = document.getElementById('clearBtn');
+const emptyState  = document.getElementById('emptyState');
+const noResults   = document.getElementById('noResults');
+const resultsHeader = document.getElementById('resultsHeader');
+const resultsCount  = document.getElementById('resultsCount');
+const resultsList   = document.getElementById('resultsList');
+const studentCard   = document.getElementById('studentCard');
+const backBtn       = document.getElementById('backBtn');
+
+function getInitial(name) {
+  return (name || '').trim().split(' ')[0]?.[0] || '؟';
+}
+
+function hideAll() {
+  emptyState.style.display = 'none';
+  noResults.style.display = 'none';
+  resultsHeader.style.display = 'none';
+  resultsList.style.display = 'none';
+  studentCard.style.display = 'none';
+  backBtn.style.display = 'none';
+}
+
+function showEmpty() {
+  hideAll();
+  emptyState.style.display = '';
+}
+
+function showNoResults() {
+  hideAll();
+  noResults.style.display = 'block';
+}
+
+function showDetail(student, hasMultiple) {
+  hideAll();
+  document.getElementById('cardAvatar').textContent    = getInitial(student.name);
+  document.getElementById('cardName').textContent      = student.name;
+  document.getElementById('cardId').textContent        = student.id || '—';
+  document.getElementById('cardClass').textContent     = student.class || '—';
+  document.getElementById('cardCommittee').textContent = student.committee || '—';
+  document.getElementById('cardClassroom').textContent = student.classroom || '—';
+  document.getElementById('cardBuilding').textContent  = student.building || '—';
+  document.getElementById('cardSeat').textContent      = student.seat || '—';
+  studentCard.style.display = 'block';
+  studentCard.style.animation = 'none';
+  void studentCard.offsetWidth;
+  studentCard.style.animation = '';
+  if (hasMultiple) { backBtn.style.display = 'flex'; }
+}
+
+function showList(results) {
+  if (results.length === 1) {
+    showDetail(results[0].raw, false);
+    return;
+  }
+  hideAll();
+  resultsCount.innerHTML = 'تم العثور على <strong>' + results.length + '</strong> نتيجة';
+  resultsHeader.style.display = 'flex';
+  resultsList.innerHTML = '';
+  resultsList.style.display = 'flex';
+  const limit = Math.min(results.length, 60);
+  for (let i = 0; i < limit; i++) {
+    const s = results[i].raw;
+    const item = document.createElement('div');
+    item.className = 'result-item';
+    item.style.animationDelay = Math.min(i * 0.04, 0.5) + 's';
+    item.innerHTML =
+      '<div class="result-item-header">' +
+        '<div class="result-avatar">' + getInitial(s.name) + '</div>' +
+        '<div class="result-info">' +
+          '<div class="result-name">' + s.name + '</div>' +
+          '<div class="result-meta">' +
+            '<span>🗂️ اللجنة ' + s.committee + '</span>' +
+            '<span>🚪 ' + s.classroom + '</span>' +
+            '<span>🏛️ ' + s.building + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<svg class="result-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>' +
+      '</div>';
+    (function(student) {
+      item.addEventListener('click', function() {
+        showDetail(student, true);
+      });
+    })(s);
+    resultsList.appendChild(item);
+  }
+}
+
+function matchId(storedClean, queryDigits) {
+  if (!storedClean || !queryDigits) return false;
+  // exact match
+  if (storedClean === queryDigits) return true;
+  // query is a prefix of stored (user typed partial ID)
+  if (storedClean.startsWith(queryDigits)) return true;
+  // stored is a prefix of query (database has fewer digits than the actual card)
+  if (storedClean.length >= 6 && queryDigits.startsWith(storedClean)) return true;
+  // stored contains query as substring (for non-standard IDs)
+  if (storedClean.length >= 6 && storedClean.includes(queryDigits)) return true;
+  return false;
+}
+
+function doSearch(query) {
+  const q = toAsciiDigits(query).trim();
+  clearBtn.classList.toggle('visible', q.length > 0);
+  if (q.length < 2) { showEmpty(); return; }
+  const qNorm = normalise(q);
+  const digits = q.replace(/[^\d]/g, '');
+  const isNumeric = digits.length >= 4;
+  const results = INDEX.filter(function(entry) {
+    if (isNumeric && matchId(entry.id_clean, digits)) return true;
+    return entry.name_norm.includes(qNorm);
+  });
+  currentResults = results;
+  if (results.length === 0) { showNoResults(); return; }
+  showList(results);
+}
+
+let debounceTimer;
+searchInput.addEventListener('input', function(e) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function() { doSearch(e.target.value); }, 180);
+});
+
+clearBtn.addEventListener('click', function() {
+  searchInput.value = '';
+  clearBtn.classList.remove('visible');
+  showEmpty();
+  searchInput.focus();
+});
+
+backBtn.addEventListener('click', function() {
+  showList(currentResults);
+});
+
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    searchInput.value = '';
+    clearBtn.classList.remove('visible');
+    showEmpty();
+  }
+});
+
+showEmpty();
+</script>
+</body>
+</html>

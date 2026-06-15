@@ -1,0 +1,11 @@
+# Raw data files
+*.xlsx
+students_data.json
+build_app.py
+
+# IDE / tool config
+.claude/
+
+# OS files
+Thumbs.db
+.DS_Store
